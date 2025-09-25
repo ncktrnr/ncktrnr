@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.node.field_content
     - filter.format.content_format
+    - filter.format.html
     - node.type.page
   module:
     - text
@@ -23,4 +24,5 @@ default_value_callback: ''
 settings:
   allowed_formats:
     - content_format
+    - html
 field_type: text_long

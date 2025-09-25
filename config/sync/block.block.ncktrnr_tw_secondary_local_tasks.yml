@@ -1,0 +1,22 @@
+uuid: 3e99bdf2-f457-4a4e-9340-dabc10fcbe51
+langcode: en
+status: true
+dependencies:
+  theme:
+    - ncktrnr_tw
+_core:
+  default_config_hash: 3KAyDgB3FHENrBwroAUcCPvkfPHBMFcRDnsZFyFMuwc
+id: ncktrnr_tw_secondary_local_tasks
+theme: ncktrnr_tw
+region: highlighted
+weight: -2
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: 'Secondary tabs'
+  label_display: '0'
+  provider: core
+  primary: false
+  secondary: true
+visibility: {  }

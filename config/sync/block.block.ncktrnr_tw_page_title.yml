@@ -1,0 +1,26 @@
+uuid: e0423c88-6545-4bfc-b5e5-f2b693e90bb5
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - ncktrnr_tw
+_core:
+  default_config_hash: dY7_Wihz9ohfBPKP554_brUfc9nPaecShShmC_VTGRM
+id: ncktrnr_tw_page_title
+theme: ncktrnr_tw
+region: sidebar_first
+weight: -5
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Page title'
+  label_display: '0'
+  provider: core
+visibility:
+  request_path:
+    id: request_path
+    negate: true
+    pages: '<front>'

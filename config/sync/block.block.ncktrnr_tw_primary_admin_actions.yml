@@ -1,0 +1,20 @@
+uuid: f6a575df-0b34-490a-a3a8-df52215e21ae
+langcode: en
+status: true
+dependencies:
+  theme:
+    - ncktrnr_tw
+_core:
+  default_config_hash: bXIY_bcTLD1-0gwNQhWPHANNy6hQa_RxJgvHxKhNS2E
+id: ncktrnr_tw_primary_admin_actions
+theme: ncktrnr_tw
+region: highlighted
+weight: -5
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: 'Primary admin actions'
+  label_display: '0'
+  provider: core
+visibility: {  }

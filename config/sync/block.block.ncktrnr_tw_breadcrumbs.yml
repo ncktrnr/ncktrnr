@@ -1,0 +1,22 @@
+uuid: 9ee332af-2cf5-4fb8-b060-2ea56c0b8dfb
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - ncktrnr_tw
+_core:
+  default_config_hash: rUKMsaj4XvIHtU3kRiHIA6Rkn4IHzCkhTiUZudMkp14
+id: ncktrnr_tw_breadcrumbs
+theme: ncktrnr_tw
+region: breadcrumb
+weight: 0
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility: {  }

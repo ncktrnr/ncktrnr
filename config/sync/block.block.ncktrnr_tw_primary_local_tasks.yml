@@ -1,0 +1,22 @@
+uuid: 2bd53d7c-7d7b-48b4-8ad2-f2893537775f
+langcode: en
+status: true
+dependencies:
+  theme:
+    - ncktrnr_tw
+_core:
+  default_config_hash: A_KsAw1fyIvdBubmxkvtCtoSuV62cVV-p0RSPnvqc9U
+id: ncktrnr_tw_primary_local_tasks
+theme: ncktrnr_tw
+region: highlighted
+weight: -4
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: 'Primary tabs'
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: false
+visibility: {  }
