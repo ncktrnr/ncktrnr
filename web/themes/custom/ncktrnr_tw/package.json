@@ -1,0 +1,21 @@
+{
+  "name": "ncktrnr_tw",
+  "version": "1.0.0",
+  "description": "ncktrnr_tw theme, generated from starterkit_theme. Additional information on generating themes can be found in the [Starterkit documentation](https://www.drupal.org/docs/core-modules-and-themes/core-themes/starterkit-theme).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx @tailwindcss/cli -i ./css/tailwind.css -o ./css/styles.css",
+    "watch": "npx @tailwindcss/cli -i ./css/tailwind.css -o ./css/styles.css --watch",
+    "build:prod": "NODE_ENV=production npx @tailwindcss/cli -i ./css/tailwind.css -o ./css/styles.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.13"
+  }
+}

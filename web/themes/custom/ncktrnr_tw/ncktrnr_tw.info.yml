@@ -1,0 +1,24 @@
+name: ncktrnr_tw
+type: theme
+'base theme': stable9
+version: 1.0.0
+libraries:
+  - ncktrnr_tw/base
+  - ncktrnr_tw/messages
+  - core/normalize
+libraries-extend:
+  user/drupal.user:
+    - ncktrnr_tw/user
+  core/drupal.dropbutton:
+    - ncktrnr_tw/dropbutton
+  core/drupal.dialog:
+    - ncktrnr_tw/dialog
+  file/drupal.file:
+    - ncktrnr_tw/file
+  core/drupal.progress:
+    - ncktrnr_tw/progress
+  core/drupal.tablesort:
+    - ncktrnr_tw/drupal.tablesort
+description: ''
+core_version_requirement: ^11
+generator: 'starterkit_theme:11.2.4'

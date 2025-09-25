@@ -1,4 +1,38 @@
 name: ncktrnr
 recipe: drupal11
 config:
+  php: '8.3'
   webroot: web
+
+services:
+  node:
+    type: node:20
+    build:
+      - "bash -lc 'cd /app/web/themes/custom/ncktrnr_tw && (npm ci || npm install)'"
+
+tooling:
+  composer:
+    service: appserver
+  drush:
+    service: appserver
+  npm:
+    service: node
+  node:
+    service: node
+  tw-install:
+    service: node
+    cmd: "bash -lc 'cd /app/web/themes/custom/ncktrnr_tw && (npm ci || npm install)'"
+  tw-dev:
+    service: node
+    cmd: "bash -lc 'cd /app/web/themes/custom/ncktrnr_tw && npm run dev'"
+  tw-build:
+    service: node
+    cmd: "bash -lc 'cd /app/web/themes/custom/ncktrnr_tw && npm run build'"
+
+proxy:
+  node:
+    - node.ncktrnr.lndo.site:5173
+
+events:
+  post-start:
+    - appserver: "bash -lc '[ -d vendor ] || composer install'"
