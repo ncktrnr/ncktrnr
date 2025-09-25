@@ -24,6 +24,7 @@ settings:
       - outdent
       - alignment
       - insertTable
+      - strikethrough
       - drupalMedia
       - undo
       - redo
