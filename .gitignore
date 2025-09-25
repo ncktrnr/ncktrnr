@@ -49,4 +49,4 @@ web/sites/*/services.local.yml
 *.sql
 *.sql.gz
 *.mysql
-*.mysql.gz
+*.mysql.gz/web/sites/*/settings.local.php
