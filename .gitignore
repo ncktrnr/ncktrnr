@@ -50,3 +50,6 @@ web/sites/*/services.local.yml
 *.sql.gz
 *.mysql
 *.mysql.gz/web/sites/*/settings.local.php
+
+#Node modules anywhere
+**/node_modules
