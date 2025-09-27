@@ -5,7 +5,7 @@ version: 1.0.0
 libraries:
   - ncktrnr_tw/base
   - ncktrnr_tw/messages
-  - core/normalize
+  - ncktrnr_tw/global-styling
 libraries-extend:
   user/drupal.user:
     - ncktrnr_tw/user
