@@ -49,7 +49,7 @@ web/sites/*/services.local.yml
 *.sql
 *.sql.gz
 *.mysql
-*.mysql.gz/web/sites/*/settings.local.php
+*.mysql.gz
 
 #Node modules anywhere
 **/node_modules
