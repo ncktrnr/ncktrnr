@@ -48,6 +48,7 @@ web/sites/*/services.local.yml
 # Ignore DB dumps
 *.sql
 *.sql.gz
+*.sql.gz.gz
 *.mysql
 *.mysql.gz
 
