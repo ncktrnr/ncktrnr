@@ -1,1 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --font-sans: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --font-serif: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --font-body: var(--font-sans); 
+    --font-display: var(--font-sans);
+}
+
+@layer base {
+    html {
+        font-family: var(--font-sans); 
+  }
+
+    body {
+        font-family: var(--font-body); 
+  }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+  }
+
+  p, span, a, li, ol, strong, em, b, i {
+    font-family: var(--font-body);
+  }
+}
+
+@layer components {
+    :root {
+    --logo-abbr-fallback: 7ch; 
+    --logo-full-fallback: 12.6ch;
+    }
+
+    .typography {
+      color: var(--color-gray-950);
+    }
+
+    .prose {
+        font-family: var(--font-body);
+    }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    font-family: var(--font-display);
+  }
+
+    /* Navigation container */
+  .primary-nav { 
+    @apply flex items-center mx-auto max-w-2xl justify-between rounded-full border-2 border-neutral-500 bg-white px-8 py-4; 
+     
+    }
+  .primary-nav a { 
+    @apply text-neutral-900 rounded-md inline-flex items-center; 
+    }
+  .primary-nav a:focus-visible { 
+    outline: 1px solid #111827; outline-offset: 2px; 
+    }
+
+    /* Anchor stays full width for reliable clicks */
+    .logo {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        width: var(--full-w, var(--logo-full-fallback));
+    }
+
+    /* Inner reveal mask animates width (GPU hint) */
+    .logo .reveal {
+        display: inline-block;
+        overflow: hidden;
+        width: var(--abbr-w, var(--logo-abbr-fallback));
+        transition: width 220ms cubic-bezier(.22,.9,.2,1);
+        will-change: width;
+    }
+    .logo:hover .reveal,
+    .logo:focus-visible .reveal { width: var(--full-w, var(--logo-full-fallback)); }
+
+    /* Track spans full width to avoid cropping */
+    .logo .track { position: relative; display: block; line-height: 1; height: 1em; width: var(--full-w, var(--logo-full-fallback)); }
+
+    /* Kept letters: slight stagger so width starts first, then slide */
+    .logo .char { position: absolute; top: 0; left: 0; transform: translateX(var(--dx, 0)); }
+    .logo .char.keep { transition: transform 220ms cubic-bezier(.22,.9,.2,1) 15ms; will-change: transform; }
+    .logo:hover .char.keep,
+    .logo:focus-visible .char.keep { transform: translateX(0); }
+
+    /* Missing letters: quick, subtle fade after reveal begins */
+    .logo .char.missing { opacity: 0; transition: opacity 60ms ease-out 30ms; will-change: opacity; }
+    .logo:hover .char.missing,
+    .logo:focus-visible .char.missing { opacity: 1; }
+
+    /* Touch (no hover): always show full */
+    @media (hover: none) {
+        .logo .reveal { width: var(--full-w, var(--logo-full-fallback)); }
+        .logo .char.keep { transform: translateX(0); }
+        .logo .char.missing { opacity: 1; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        .logo .reveal { transition: none; width: var(--full-w, var(--logo-full-fallback)); }
+        .logo .char { transition: none !important; transform: translateX(0) !important; opacity: 1 !important; }
+    }
+
+      /* High-contrast and forced-colors adjustments */
+    @media (prefers-contrast: more) {
+        .primary-nav a:focus-visible,
+        .logo:focus-visible { outline-width: 3px; }
+    }
+    @media (forced-colors: active) {
+        .primary-nav { border-color: CanvasText; }
+        .primary-nav a:focus-visible,
+        .logo:focus-visible { outline-color: Highlight; }
+    }
+
+}
+
+@layer utilities {
+
+  .prose {
+    font-family: var(--font-body);
+    max-width: 76ch;
+  }
+
+  h1.page-title {
+    @apply text-2xl lg:text-3xl xl:text-4xl; 
+  }
+  /* .prose a {
+    color: var(--color-violet-500);
+    &:hover {
+        color: var(--color-violet-400);
+    }
+    &:visited {
+        color: var(--color-violet-600);
+    }
+  } */
+}
