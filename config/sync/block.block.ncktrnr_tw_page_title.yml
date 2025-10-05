@@ -10,8 +10,8 @@ _core:
   default_config_hash: dY7_Wihz9ohfBPKP554_brUfc9nPaecShShmC_VTGRM
 id: ncktrnr_tw_page_title
 theme: ncktrnr_tw
-region: sidebar_first
-weight: -5
+region: content
+weight: -3
 provider: null
 plugin: page_title_block
 settings:
