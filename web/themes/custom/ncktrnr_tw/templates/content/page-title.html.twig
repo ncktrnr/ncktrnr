@@ -14,6 +14,8 @@
 #}
 {{ title_prefix }}
 {% if title %}
-  <h1{{ title_attributes.addClass('page-title') }}>{{ title }}</h1>
+  <div class="prose lg:prose-lg mx-auto">
+    <h1{{ title_attributes.addClass('page-title text-sm') }}>{{ title }}</h1>
+  </div>
 {% endif %}
 {{ title_suffix }}

@@ -42,10 +42,14 @@
  * @see html.html.twig
  */
 #}
+{{ attach_library('ncktrnr_tw/logo_nav') }}
 <div class="layout-container">
 
-  <header role="banner">
+  <header role="banner" class="mb-12">
     {{ page.header }}
+
+    {% include '@ncktrnr_tw/includes/logo-nav.html.twig' %}
+
   </header>
 
   {{ page.primary_menu }}
@@ -60,7 +64,7 @@
   <main role="main">
     <a id="main-content" tabindex="-1"></a>{# link is in html.html.twig #}
 
-    <div class="layout-content">
+    <div class="layout-content container px-4 lg:px-0">
       {{ page.content }}
     </div>{# /.layout-content #}
 
@@ -79,7 +83,10 @@
   </main>
 
   {% if page.footer %}
-    <footer role="contentinfo">
+    <footer role="contentinfo" class="border-t-2 border-neutral-600 min-h-24 relative">
+    <div class="absolute -top-17 right-10">
+      {% include '@ncktrnr_tw/images/dino-vegan.svg' %}
+    </div>
       {{ page.footer }}
     </footer>
   {% endif %}
