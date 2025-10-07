@@ -76,7 +76,7 @@
         display: inline-block;
         overflow: hidden;
         width: var(--abbr-w, var(--logo-abbr-fallback));
-        transition: width 220ms cubic-bezier(.22,.9,.2,1);
+        transition: width 180ms cubic-bezier(.22,.9,.2,1);
         will-change: width;
     }
     .logo:hover .reveal,
@@ -87,7 +87,7 @@
 
     /* Kept letters: slight stagger so width starts first, then slide */
     .logo .char { position: absolute; top: 0; left: 0; transform: translateX(var(--dx, 0)); }
-    .logo .char.keep { transition: transform 220ms cubic-bezier(.22,.9,.2,1) 15ms; will-change: transform; }
+    .logo .char.keep { transition: transform 120ms cubic-bezier(.22,.9,.2,1) 15ms; will-change: transform; }
     .logo:hover .char.keep,
     .logo:focus-visible .char.keep { transform: translateX(0); }
 
@@ -95,6 +95,9 @@
     .logo .char.missing { opacity: 0; transition: opacity 60ms ease-out 30ms; will-change: opacity; }
     .logo:hover .char.missing,
     .logo:focus-visible .char.missing { opacity: 1; }
+
+    .logo .fallback { display: inline; }
+    .logo.is-built .fallback { display: none; } /* hide once JS has built the animated letters */
 
     /* Touch (no hover): always show full */
     @media (hover: none) {

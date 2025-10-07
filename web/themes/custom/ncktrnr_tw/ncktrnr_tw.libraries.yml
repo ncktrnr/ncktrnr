@@ -119,7 +119,4 @@ logo_nav:
   js:
     js/logo-expand.js:
       attributes:
-      defer: true
-      dependencies:
-      - core/drupal
-      - core/once
+        defer: true

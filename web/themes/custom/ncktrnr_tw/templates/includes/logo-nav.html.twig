@@ -2,11 +2,17 @@
 
 <div class="container p-4">
   <nav class="primary-nav" role="navigation" aria-label="Primary"> 
-    <a href="{{ path('<front>') }}" class="logo js-logo inline-flex items-center select-none whitespace-nowrap overflow-hidden focus-visible:outline focus-visible:outline-neutral-900 focus-visible:outline-offset-2 rounded py-2" aria-label="Nick Turner">  
-        <span class="reveal leading-none">
-            <span class="track js-track" aria-hidden="true"> </span>
-        </span> 
-    </a> 
+    <a href="{{ path('<front>') }}" class="logo js-logo inline-flex items-center select-none whitespace-nowrap rounded py-2 focus-visible:outline focus-visible:outline-neutral-900 focus-visible:outline-offset-2" aria-label="Nick Turner"> 
+      <span class="reveal leading-none"> 
+        <span class="fallback">ncktrnr
+        </span> <!-- visible before JS --> 
+        <span class="track js-track" aria-hidden="true">
+        </span>
+      </span> 
+    </a>
+    <noscript><a href="{{ path('<front>') }}" class="font-bold text-neutral-900">Nick Turner</a>
+    </noscript>
+
     <div class="flex items-center gap-7"> 
       <a href="/work" class="relative group/link focus-visible:outline focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:ring-offset-2 text-xl duration-200 hover:text-gray-600 active:text-gray-800 rounded transition-colors py-2">work
         <span class="absolute bottom-1 left-0 w-0 h-0.5 bg-neutral-500 transition-all duration-300 ease-out group-hover/link:w-full motion-reduce:transition-none"></span>
