@@ -1,141 +1,153 @@
-(function (Drupal, once) {
+(function () {
   'use strict';
 
-  // Drupal behavior: builds the animated logo only once per element
-  Drupal.behaviors.logoExpand = {
-    attach(context) {
-      const logos = once('logoExpand', '.js-logo', context);
-      if (!logos.length) return;
+  // Simple once implementation - tracks processed elements
+  const processed = new WeakSet();
 
-      // Map acronym letters to their positions in the full string (left-to-right)
-      function mapKept(abbr, full) {
-        const kept = []; let j = 0;
-        for (let i = 0; i < full.length && j < abbr.length; i++) {
-          if (full[i].toLowerCase() === abbr[j].toLowerCase()) {
-            kept.push({ fullIndex: i, abbrIndex: j });
-            j++;
+  function init() {
+    const logos = document.querySelectorAll('.js-logo');
+    
+    logos.forEach((logo) => {
+      // Skip if already processed
+      if (processed.has(logo)) return;
+      processed.add(logo);
+
+      const track = logo.querySelector('.js-track');
+      if (!track) return;
+
+      // Allow override via data attributes, else default to "nick turner" / "ncktrnr"
+      const fullStr = logo.getAttribute('data-full') || 'nick\u00A0turner'; // NBSP between names
+      const abbrStr = logo.getAttribute('data-abbr') || 'ncktrnr';
+      const keptMap = mapKept(abbrStr, fullStr);
+
+      const measureFull = spanify(fullStr);
+      const measureAbbr = spanify(abbrStr);
+      document.body.appendChild(measureFull);
+      document.body.appendChild(measureAbbr);
+
+      let built = false;
+
+      function build() {
+        copyType(measureFull, logo);
+        copyType(measureAbbr, logo);
+
+        const full = getPositions(measureFull);
+        const abbr = getPositions(measureAbbr);
+
+        track.innerHTML = '';
+        for (let i = 0; i < fullStr.length; i++) {
+          const ch = fullStr[i];
+          const span = document.createElement('span');
+          span.className = 'char';
+          span.textContent = ch;
+          span.style.left = full.lefts[i] + 'px';
+
+          const keptEntry = keptMap.find(k => k.fullIndex === i);
+          if (keptEntry) {
+            span.classList.add('keep');
+            const dx = abbr.lefts[keptEntry.abbrIndex] - full.lefts[i];
+            span.style.setProperty('--dx', dx + 'px');
+          } else {
+            span.classList.add('missing');
           }
-        }
-        return kept;
-      }
-
-      // Create an offscreen measurer where every character is its own span
-      function spanify(str) {
-        const el = document.createElement('span');
-        Object.assign(el.style, {
-          position: 'absolute',
-          visibility: 'hidden',
-          whiteSpace: 'nowrap',
-          left: '-9999px',
-          top: '-9999px'
-        });
-        for (let i = 0; i < str.length; i++) {
-          const s = document.createElement('span');
-          s.textContent = str[i];
-          el.appendChild(s);
-        }
-        return el;
-      }
-
-      // Copy typography from the visible logo so we measure with exact metrics
-      function copyType(to, fromEl) {
-        const cs = getComputedStyle(fromEl);
-        to.style.fontFamily = cs.fontFamily;
-        to.style.fontSize = cs.fontSize;
-        to.style.fontWeight = cs.fontWeight;
-        to.style.letterSpacing = cs.letterSpacing;
-        to.style.fontKerning = cs.fontKerning;
-      }
-
-      // Get left positions (relative to the wrapper) and wrapper width
-      function getPositions(wrapper) {
-        const spans = Array.from(wrapper.children);
-        const base = wrapper.getBoundingClientRect();
-        return {
-          lefts: spans.map(s => s.getBoundingClientRect().left - base.left),
-          width: base.width
-        };
-      }
-
-      logos.forEach((logo) => {
-        const track = logo.querySelector('.js-track');
-        if (!track) return;
-
-        // Allow override via data attributes, else default to "nick turner" / "ncktrnr"
-        const fullStr = logo.getAttribute('data-full') || 'nick\u00A0turner'; // NBSP between names
-        const abbrStr = logo.getAttribute('data-abbr') || 'ncktrnr';
-        const keptMap = mapKept(abbrStr, fullStr);
-
-        const measureFull = spanify(fullStr);
-        const measureAbbr = spanify(abbrStr);
-        document.body.appendChild(measureFull);
-        document.body.appendChild(measureAbbr);
-
-        let built = false;
-
-        function build() {
-          copyType(measureFull, logo);
-          copyType(measureAbbr, logo);
-
-          const full = getPositions(measureFull);
-          const abbr = getPositions(measureAbbr);
-
-          track.innerHTML = '';
-          for (let i = 0; i < fullStr.length; i++) {
-            const ch = fullStr[i];
-            const span = document.createElement('span');
-            span.className = 'char';
-            span.textContent = ch;
-            span.style.left = full.lefts[i] + 'px';
-
-            const keptEntry = keptMap.find(k => k.fullIndex === i);
-            if (keptEntry) {
-              span.classList.add('keep');
-              const dx = abbr.lefts[keptEntry.abbrIndex] - full.lefts[i];
-              span.style.setProperty('--dx', dx + 'px');
-            } else {
-              span.classList.add('missing'); // hidden until hover/focus via CSS
-            }
-            track.appendChild(span);
-          }
-
-          // Update CSS custom properties for container width
-          const abbrW = Math.ceil(getPositions(measureAbbr).width);
-          const fullW = Math.ceil(getPositions(measureFull).width);
-          logo.style.setProperty('--abbr-w', abbrW + 'px');
-          logo.style.setProperty('--full-w', fullW + 'px');
-
-          built = true;
+          track.appendChild(span);
         }
 
-        // Rebuild when the logo box size/typography changes
-        const ro = new ResizeObserver(() => { if (built) build(); });
+        // Update CSS custom properties for container width
+        const abbrW = Math.ceil(getPositions(measureAbbr).width);
+        const fullW = Math.ceil(getPositions(measureFull).width);
+        logo.style.setProperty('--abbr-w', abbrW + 'px');
+        logo.style.setProperty('--full-w', fullW + 'px');
+        logo.classList.add('is-built');
+        
+        built = true;
+      }
 
-        // Build when the logo first comes into view (saves work on SSR/offscreen)
-        const io = new IntersectionObserver((entries) => {
-          if (entries.some(e => e.isIntersecting)) {
-            const ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
-            ready.then(() => { build(); ro.observe(logo); });
-            io.disconnect();
-          }
-        }, { rootMargin: '0px 0px 200px 0px' });
-        io.observe(logo);
+      // Rebuild when the logo box size/typography changes
+      const ro = new ResizeObserver(() => { if (built) build(); });
 
-        // If fonts finish loading later (e.g., swap/variable axis), rebuild
-        if (document.fonts) {
-          if (document.fonts.addEventListener) {
-            document.fonts.addEventListener('loadingdone', () => { if (built) build(); });
-          }
-          document.fonts.ready && document.fonts.ready.then(() => { if (built) build(); });
+      // Build when the logo first comes into view
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)) {
+          const ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+          ready.then(() => { build(); ro.observe(logo); });
+          io.disconnect();
         }
+      }, { rootMargin: '0px 0px 200px 0px' });
+      io.observe(logo);
 
-        // Fallback: viewport resize debounce
-        let t;
-        window.addEventListener('resize', () => {
-          clearTimeout(t);
-          t = setTimeout(() => { if (built) build(); }, 120);
-        });
+      // If fonts finish loading later, rebuild
+      if (document.fonts) {
+        if (document.fonts.addEventListener) {
+          document.fonts.addEventListener('loadingdone', () => { if (built) build(); });
+        }
+        document.fonts.ready && document.fonts.ready.then(() => { if (built) build(); });
+      }
+
+      // Fallback: viewport resize debounce
+      let t;
+      window.addEventListener('resize', () => {
+        clearTimeout(t);
+        t = setTimeout(() => { if (built) build(); }, 120);
       });
+    });
+  }
+
+  // Map acronym letters to their positions in the full string
+  function mapKept(abbr, full) {
+    const kept = []; 
+    let j = 0;
+    for (let i = 0; i < full.length && j < abbr.length; i++) {
+      if (full[i].toLowerCase() === abbr[j].toLowerCase()) {
+        kept.push({ fullIndex: i, abbrIndex: j });
+        j++;
+      }
     }
-  };
-})(Drupal, once);
+    return kept;
+  }
+
+  // Create an offscreen measurer where every character is its own span
+  function spanify(str) {
+    const el = document.createElement('span');
+    Object.assign(el.style, {
+      position: 'absolute',
+      visibility: 'hidden',
+      whiteSpace: 'nowrap',
+      left: '-9999px',
+      top: '-9999px'
+    });
+    for (let i = 0; i < str.length; i++) {
+      const s = document.createElement('span');
+      s.textContent = str[i];
+      el.appendChild(s);
+    }
+    return el;
+  }
+
+  // Copy typography from the visible logo so we measure with exact metrics
+  function copyType(to, fromEl) {
+    const cs = getComputedStyle(fromEl);
+    to.style.fontFamily = cs.fontFamily;
+    to.style.fontSize = cs.fontSize;
+    to.style.fontWeight = cs.fontWeight;
+    to.style.letterSpacing = cs.letterSpacing;
+    to.style.fontKerning = cs.fontKerning;
+  }
+
+  // Get left positions (relative to the wrapper) and wrapper width
+  function getPositions(wrapper) {
+    const spans = Array.from(wrapper.children);
+    const base = wrapper.getBoundingClientRect();
+    return {
+      lefts: spans.map(s => s.getBoundingClientRect().left - base.left),
+      width: base.width
+    };
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

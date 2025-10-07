@@ -28,6 +28,7 @@
     --text-3xl--line-height: calc(2.25 / 1.875);
     --text-4xl: 2.25rem;
     --text-4xl--line-height: calc(2.5 / 2.25);
+    --font-weight-bold: 700;
     --radius-md: 0.375rem;
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --default-transition-duration: 150ms;
@@ -710,9 +711,6 @@
   .gap-7 {
     gap: calc(var(--spacing) * 7);
   }
-  .overflow-hidden {
-    overflow: hidden;
-  }
   .rounded {
     border-radius: 0.25rem;
   }
@@ -753,8 +751,15 @@
     --tw-leading: 1;
     line-height: 1;
   }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
   .whitespace-nowrap {
     white-space: nowrap;
+  }
+  .text-neutral-900 {
+    color: var(--color-neutral-900);
   }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
@@ -1100,7 +1105,7 @@
     display: inline-block;
     overflow: hidden;
     width: var(--abbr-w, var(--logo-abbr-fallback));
-    transition: width 220ms cubic-bezier(.22,.9,.2,1);
+    transition: width 180ms cubic-bezier(.22,.9,.2,1);
     will-change: width;
   }
   .logo:hover .reveal, .logo:focus-visible .reveal {
@@ -1120,7 +1125,7 @@
     transform: translateX(var(--dx, 0));
   }
   .logo .char.keep {
-    transition: transform 220ms cubic-bezier(.22,.9,.2,1) 15ms;
+    transition: transform 120ms cubic-bezier(.22,.9,.2,1) 15ms;
     will-change: transform;
   }
   .logo:hover .char.keep, .logo:focus-visible .char.keep {
@@ -1133,6 +1138,12 @@
   }
   .logo:hover .char.missing, .logo:focus-visible .char.missing {
     opacity: 1;
+  }
+  .logo .fallback {
+    display: inline;
+  }
+  .logo.is-built .fallback {
+    display: none;
   }
   @media (hover: none) {
     .logo .reveal {
@@ -1217,6 +1228,10 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
 @property --tw-blur {
   syntax: "*";
   inherits: false;
@@ -1293,6 +1308,7 @@
       --tw-skew-y: initial;
       --tw-border-style: solid;
       --tw-leading: initial;
+      --tw-font-weight: initial;
       --tw-blur: initial;
       --tw-brightness: initial;
       --tw-contrast: initial;

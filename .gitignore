@@ -10,7 +10,9 @@
 sites/*/settings*.php
 sites/*/services*.yml
 
-# Ignore paths that contain user-generated content.
+# Drupal runtime files and private areas
+/web/sites/*/files/
+/web/sites/*/private/
 sites/*/files
 sites/*/private
 /web/sites//files/
@@ -33,14 +35,11 @@ sites/simpletest
 # simpletest
 
 # Ignore local settings
-web/sites/*/settings.local.php
-web/sites/*/services.local.yml
+/web/sites/*/settings.local.php
+/web/sites/*/services.local.yml
 
 # Ignore Lando overrides
 .lando.local.yml
-
-# Ignore MacOS files
-.DS_Store
 
 # Environment files
 /.env
@@ -54,3 +53,6 @@ web/sites/*/services.local.yml
 
 #Node modules anywhere
 **/node_modules
+
+# Ignore MacOS files
+.DS_Store
