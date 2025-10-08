@@ -43,6 +43,7 @@
  */
 #}
 {{ attach_library('ncktrnr_tw/logo_nav') }}
+{{ attach_library('ncktrnr_tw/lottie_player') }}
 <div class="layout-container">
 
   <header role="banner" class="mb-12">
@@ -64,7 +65,7 @@
   <main role="main">
     <a id="main-content" tabindex="-1"></a>{# link is in html.html.twig #}
 
-    <div class="layout-content container px-4 lg:px-0">
+    <div class="container px-4 layout-content lg:px-0">
       {{ page.content }}
     </div>{# /.layout-content #}
 
@@ -83,9 +84,10 @@
   </main>
 
   {% if page.footer %}
-    <footer role="contentinfo" class="border-t-2 border-neutral-600 min-h-24 relative">
+    <footer role="contentinfo" class="relative border-t-2 border-neutral-600 min-h-24">
     <div class="absolute -top-17 right-10">
-      {% include '@ncktrnr_tw/images/dino-vegan.svg' %}
+      <lottie-player src="/themes/custom/ncktrnr_tw/lottie/dino.json" background="transparent" speed="1" style="width: 200px; height: 80px;" loop hover autoplay></lottie-player>
+      <noscript>{% include '@ncktrnr_tw/images/dino-vegan.svg' %}</noscript>
     </div>
       {{ page.footer }}
     </footer>
