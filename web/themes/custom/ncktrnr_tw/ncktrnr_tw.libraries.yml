@@ -120,3 +120,7 @@ logo_nav:
     js/logo-expand.js:
       attributes:
         defer: true
+
+lottie_player:
+  js:
+    https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js: { type: external, minified: true, attributes: { defer: true } }
