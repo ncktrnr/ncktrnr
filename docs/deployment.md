@@ -110,6 +110,100 @@ $settings['config_sync_directory'] = '/home/fairytal/config/ncktrnr/sync';
 
 After this, the deploy script's excludes keep both files untouched forever.
 
+## deploy.sh, line by line
+
+What actually happens when you run it, and why each part exists.
+
+### 1. Safety rails (`set -euo pipefail`, `cd` to repo root)
+
+The first line makes bash strict: stop on any error (`-e`), treat unset
+variables as errors (`-u`), and fail a pipeline if any command in it fails
+(`pipefail`). Without this, a failed rsync would not stop the script and it
+would happily run `drush deploy` against a half-copied site. The `cd` means
+the script works no matter which directory you call it from.
+
+### 2. Config block
+
+All the server facts in one place – the SSH alias, the three server paths,
+and how to invoke drush remotely. If GreenGeeks ever moves the account,
+this is the only section to edit.
+
+### 3. Preflight checks
+
+Four guards, each one a rule made mechanical:
+
+- **on `main`** – deploys only ship code that went through a PR
+- **clean working tree** – what deploys is exactly what git records; no
+  half-finished edits sneak out
+- **local main == origin/main** – you cannot deploy commits GitHub has
+  never seen, and you cannot forget to pull someone's merge first
+- **server symlink exists** – `/home/fairytal/ncktrnr/web` is what makes
+  the shared-vendor layout work; if it vanished, the deploy would succeed
+  and the site would still break, so it is checked up front
+
+Any failure prints a red FAIL and exits before anything is touched.
+
+### 4. Build
+
+- `composer install --no-dev --optimize-autoloader` – reinstalls `vendor/`
+  without development packages (test frameworks and similar do not belong
+  on a public server) and pre-computes the class map so production PHP
+  never searches the filesystem for classes
+- `npm run build:prod` – minified Tailwind CSS
+
+Note the local side effect: your `vendor/` is temporarily
+production-shaped. Step 8 puts it back.
+
+### 5. The three rsyncs
+
+rsync compares source and destination and transfers only differences –
+that is why a no-change deploy takes seconds. Flags: `-rlptz` is recurse,
+copy symlinks as symlinks, preserve permissions and timestamps, compress
+in transit; `-v` lists each file so the terminal shows what changed.
+
+- `vendor/ → ~/ncktrnr/vendor/` – with `--delete`, so removed packages
+  disappear from the server instead of rotting there
+- `web/ → public_html/ncktrnr.com/` – also `--delete` (stale core files
+  from old Drupal versions are a real hazard), but with the exclude list
+  doing double duty. An excluded path is neither uploaded **nor deleted**
+  – rsync simply pretends it does not exist on either side. That single
+  mechanism is what protects `autoload.php`, every `settings*.php`, the
+  `files/` uploads, `demos/`, and cPanel's `.well-known`, `cgi-bin` and
+  `.ftpquota`
+- `config/sync/ → ~/config/ncktrnr/sync/` – the exported Drupal config,
+  mirrored exactly
+
+With `--dry-run`, the same three rsyncs run with `-n` (compare and report,
+transfer nothing) and the script stops here.
+
+### 6. `drush deploy` on the server
+
+One drush command that runs the post-deploy sequence in the officially
+recommended order: `updb` (database updates for the new code), `config:import`
+(apply the config that just synced), `cache:rebuild`, then any deploy hooks.
+Doing this by hand in the wrong order is a classic way to break a Drupal
+site; the single command removes the choice.
+
+### 7. Verification – the past failure modes, mechanised
+
+Each check is one of the incidents from the v1 era, turned into a test:
+
+- `autoload.php` still points at `../../ncktrnr/vendor` (it used to get
+  overwritten and revert to `../vendor`)
+- the server settings still use the production DB host (they used to get
+  clobbered with the local one)
+- `settings.local.php` does not exist on the server (it was once uploaded
+  by accident)
+- drush can bootstrap Drupal – proves PHP, database and code agree
+- `https://ncktrnr.com` answers HTTP 200 – proves it from the outside
+
+If any of these fail you find out from the script, not from visitors.
+
+### 8. Restore
+
+`composer install` (with dev packages) returns your local `vendor/` to its
+normal state, so ddev and local tooling keep working.
+
 ## If the site goes blank
 
 In order of likelihood:
