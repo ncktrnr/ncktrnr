@@ -7,9 +7,11 @@
 #   scripts/deploy.sh --dry-run  show what rsync would transfer, change nothing
 #
 # What it never touches on the server (excluded and protected from --delete):
-#   - public_html/ncktrnr.com/autoload.php        (points at ../../ncktrnr/vendor)
-#   - public_html/ncktrnr.com/autoload_runtime.php (same – Symfony Runtime boot)
+#   - public_html/ncktrnr.com/autoload_runtime.php (generated single-path
+#     locally; the server keeps a dual-path copy – see docs/deployment.md)
 #   - sites/default/settings.php                  (server keeps its own)
+# autoload.php is deployed normally: the committed version is dual-path and
+# works on both layouts.
 #   - sites/default/settings.prod.php             (server-only, never in git)
 #   - sites/default/settings.local.php            (must not exist on server)
 #   - sites/*/files                               (user uploads)
@@ -92,7 +94,6 @@ run_rsync -rlptzv $DRY_RUN --delete \
 
 log "Syncing web/ -> $REMOTE_DOCROOT/"
 run_rsync -rlptzv $DRY_RUN --delete \
-  --exclude='/autoload.php' \
   --exclude='/autoload_runtime.php' \
   --exclude='/sites/default/settings.php' \
   --exclude='/sites/default/settings.*.php' \
