@@ -106,7 +106,8 @@
             "drupal/core-project-message": true,
             "drupal/core-recipe-unpack": true,
             "php-http/discovery": true,
-            "drupal/core-vendor-hardening": true
+            "drupal/core-vendor-hardening": true,
+            "symfony/runtime": true
         },
         "bin-dir": "vendor/bin",
         "sort-packages": true,
