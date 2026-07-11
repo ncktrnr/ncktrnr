@@ -77,6 +77,15 @@ deploy. It then:
 If any verification step fails the script stops with a red FAIL line – check
 that item on the server before doing anything else.
 
+**Rule: never run ad-hoc rsyncs against production.** All syncing goes
+through `scripts/deploy.sh` (use `--dry-run` for diagnostics) so the
+current exclude list always applies. This rule exists because of a real
+incident: on 2026-07-11 a hand-typed diagnostic rsync used a stale exclude
+list, overwrote the freshly fixed `autoload_runtime.php`, and took the
+site down for a second time in one evening. After *any* write to
+production, verify from the outside (`curl -s -o /dev/null -w '%{http_code}'
+https://ncktrnr.com/`) – an exit code is not a health check.
+
 ## One-time production step (before the first deploy of the new settings.php)
 
 Production currently manages its whole environment inside `settings.php` by
