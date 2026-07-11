@@ -56,3 +56,9 @@ sites/simpletest
 
 # Ignore MacOS files
 .DS_Store
+# Local database pulls
+/backups/
+
+# Environment settings that must never be committed
+/web/sites/*/settings.ddev.php
+/web/sites/*/settings.prod.php
