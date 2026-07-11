@@ -16,10 +16,13 @@ deployed over rsync/SSH. This doc is the source of truth for how code moves.
 | SSH | – | alias `greengeeks-fairytales` (chi202.greengeeks.net, user `fairytal`) |
 
 The server keeps a Composer web symlink `/home/fairytal/ncktrnr/web →
-public_html/ncktrnr.com`, and the production `autoload.php` must contain:
+public_html/ncktrnr.com`, and the production `autoload.php` **and**
+`autoload_runtime.php` (Symfony Runtime boot, arrived with Drupal 11.4)
+must both point at the shared vendor:
 
 ```php
 return require __DIR__ . '/../../ncktrnr/vendor/autoload.php';
+return require __DIR__ . '/../../ncktrnr/vendor/autoload_runtime.php';
 ```
 
 ## Settings architecture
@@ -63,7 +66,7 @@ deploy. It then:
 
 1. builds production vendor (`composer install --no-dev`) and theme CSS
 2. rsyncs `vendor/`, `web/` and `config/sync/` to their server locations,
-   excluding (and protecting from deletion): `autoload.php`, all
+   excluding (and protecting from deletion): `autoload.php`, `autoload_runtime.php`, all
    `settings*.php`, `sites/*/files`, `.well-known`, `cgi-bin`
 3. runs `drush deploy -y` on the server (updb + cim + cr in the right order)
 4. verifies every known past failure mode: autoload path, DB host, absence of
@@ -167,7 +170,7 @@ in transit; `-v` lists each file so the terminal shows what changed.
   from old Drupal versions are a real hazard), but with the exclude list
   doing double duty. An excluded path is neither uploaded **nor deleted**
   – rsync simply pretends it does not exist on either side. That single
-  mechanism is what protects `autoload.php`, every `settings*.php`, the
+  mechanism is what protects both autoload files, every `settings*.php`, the
   `files/` uploads, `demos/`, and cPanel's `.well-known`, `cgi-bin` and
   `.ftpquota`
 - `config/sync/ → ~/config/ncktrnr/sync/` – the exported Drupal config,
@@ -190,6 +193,9 @@ Each check is one of the incidents from the v1 era, turned into a test:
 
 - `autoload.php` still points at `../../ncktrnr/vendor` (it used to get
   overwritten and revert to `../vendor`)
+- `autoload_runtime.php` likewise – this one slipped through on the first
+  11.4.2 deploy (2026-07-11, ten minutes of HTTP 500) because Drupal 11.4
+  introduced it and the exclude list didn't know it yet
 - the server settings still use the production DB host (they used to get
   clobbered with the local one)
 - `settings.local.php` does not exist on the server (it was once uploaded
@@ -208,7 +214,9 @@ normal state, so ddev and local tooling keep working.
 
 In order of likelihood:
 
-1. `autoload.php` – must require `../../ncktrnr/vendor/autoload.php`
+1. `autoload.php` and `autoload_runtime.php` – both must require
+   `../../ncktrnr/vendor/...` (check `error_log` in the docroot: a wrong
+   path shows up there as 'Failed opening required')
 2. `settings.prod.php` present and readable, DB host `localhost`
 3. `settings.local.php` must NOT exist on the server
 4. symlink `/home/fairytal/ncktrnr/web` must exist
