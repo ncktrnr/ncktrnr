@@ -225,6 +225,16 @@ normal state, so ddev and local tooling keep working.
 
 ## If the site goes blank
 
+Also covers 'the site works but JS/CSS is broken or the admin UI errors
+with missing jQuery': if assets 404 while the files exist on disk, it is
+file permissions – ddev's mutagen writes files as 600, and a sync without
+`--chmod` ships them unreadable by the static server (this hit every file
+the 11.4.2 update touched, 2026-07-12). Fix:
+`find <docroot> -type d ! -perm -o+x -exec chmod 755 {} +` and
+`find <docroot> -type f ! -perm -o+r ! -name 'settings*.php' -exec chmod 644 {} +`
+then `drush cr`. The deploy script now forces sane modes and curls a real
+asset as part of verification.
+
 In order of likelihood:
 
 1. `autoload_runtime.php` – must be the dual-path version (or point at

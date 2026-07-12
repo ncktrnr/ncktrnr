@@ -92,8 +92,12 @@ log "Syncing vendor/ -> $REMOTE_VENDOR/"
 run_rsync -rlptzv $DRY_RUN --delete \
   vendor/ "$REMOTE:$REMOTE_VENDOR/"
 
+# --chmod forces web-servable permissions regardless of local modes: ddev's
+# mutagen writes files as 600, and shipping that once made every asset the
+# 11.4.2 update touched a 404 (files existed but the static server could not
+# read them – jQuery included, which broke the admin UI).
 log "Syncing web/ -> $REMOTE_DOCROOT/"
-run_rsync -rlptzv $DRY_RUN --delete \
+run_rsync -rlptzv $DRY_RUN --delete --chmod=D755,Fu+rw,Fgo+r \
   --exclude='/autoload_runtime.php' \
   --exclude='/sites/default/settings.php' \
   --exclude='/sites/default/settings.*.php' \
@@ -141,6 +145,11 @@ ssh "$REMOTE" "$REMOTE_DRUSH status --field=bootstrap | grep -q Successful" \
 
 HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' "$SITE_URL")
 [[ "$HTTP_CODE" == "200" ]] || fail "$SITE_URL returned HTTP $HTTP_CODE"
+
+# A page can be 200 while static assets 404 (e.g. unreadable file modes) –
+# check a real asset shipped by the deploy.
+ASSET_CODE=$(curl -sS -o /dev/null -w '%{http_code}' "$SITE_URL/core/assets/vendor/jquery/jquery.min.js")
+[[ "$ASSET_CODE" == "200" ]] || fail "static asset check returned HTTP $ASSET_CODE (file permissions?)"
 
 # ---------------------------------------------------------------- restore ----
 log "Restoring local dev dependencies"
