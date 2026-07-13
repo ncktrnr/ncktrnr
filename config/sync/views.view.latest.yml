@@ -139,6 +139,7 @@ display:
           operator: 'not in'
           value:
             page: page
+            case_study: case_study
           group: 1
           exposed: false
           expose:

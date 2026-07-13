@@ -4,7 +4,7 @@ status: true
 dependencies: {  }
 name: 'Case study'
 type: case_study
-description: 'A work project rendered in full on the work page – no standalone destination.'
+description: 'A work project shown on the work page. Whether case studies also get standalone pages is still an open decision.'
 help: null
 new_revision: true
 preview_mode: 1
