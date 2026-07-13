@@ -2,12 +2,109 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Dark mode: manual override via data-theme on <html>; with no override,
+   prefers-color-scheme decides (see the two value blocks below). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------------------
+   v2 design tokens – from Figma `ncktrnr.com` (8hxwpK5nd45OX5jC0OsGyN),
+   frames `Home latest` 151:10 and `work page latest` 152:6102.
+   Light values are Figma's; dark values are derived (no dark frames) –
+   eyeball on /themes/custom/ncktrnr_tw/styleguide.html and adjust there.
+--------------------------------------------------------------------------- */
+
+:root {
+    /* surfaces */
+    --tone-paper: #fffaef;   /* cream – home + footer background */
+    --tone-surface: #f4f2ec; /* warm grey – inner-page background */
+    --tone-card: #ffffff;    /* work cards */
+    --tone-sky: #eef9ff;     /* hero sky – fades to night in dark mode */
+
+    /* text */
+    --tone-ink: #121212;
+    --tone-ink-muted: #636363;
+
+    /* accents */
+    --tone-rust: #da3d12;
+    --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 10%, transparent);
+    --tone-leaf: #57a636;
+    --tone-leaf-bright: #a4d43d;
+    --tone-leaf-deep: #476841;
+}
+
+[data-theme="dark"] {
+    --tone-paper: #181511;
+    --tone-surface: #211d18;
+    --tone-card: #2a251f;
+    --tone-sky: #0c1626;
+
+    --tone-ink: #f2ede1;
+    --tone-ink-muted: #a39d92;
+
+    --tone-rust: #ff6a3c;
+    --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
+    --tone-leaf: #6dbb4a;
+    --tone-leaf-bright: #b6de5a;
+    --tone-leaf-deep: #86a878;
+}
+
+/* No manual choice stored → follow the system preference */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+        --tone-paper: #181511;
+        --tone-surface: #211d18;
+        --tone-card: #2a251f;
+        --tone-sky: #0c1626;
+
+        --tone-ink: #f2ede1;
+        --tone-ink-muted: #a39d92;
+
+        --tone-rust: #ff6a3c;
+        --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
+        --tone-leaf: #6dbb4a;
+        --tone-leaf-bright: #b6de5a;
+        --tone-leaf-deep: #86a878;
+    }
+}
+
 @theme {
     --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --font-sans: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --font-serif: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --font-body: var(--font-sans); 
+    --font-body: var(--font-sans);
     --font-display: var(--font-sans);
+
+    /* type scale – Figma sizes; line heights chosen for Geist Mono */
+    --text-display: 2.25rem;            /* 36px – page headings */
+    --text-display--line-height: 1.2;
+    --text-heading: 1.5rem;             /* 24px – section/card headings */
+    --text-heading--line-height: 1.3;
+    --text-lede: 1.25rem;               /* 20px – intro/lede + nav */
+    --text-lede--line-height: 1.5;
+    --text-small: 1.125rem;             /* 18px – secondary/tag lines */
+    --text-small--line-height: 1.5;
+    --text-tiny: 1rem;                  /* 16px – footer small print */
+    --text-tiny--line-height: 1.5;
+
+    /* radii – Figma rounded rectangles */
+    --radius-card: 2.25rem;  /* 36px – cards, intro box */
+    --radius-tile: 1.6875rem;/* 27px – screenshots/gallery tiles */
+}
+
+/* Semantic colours – exposed as bg-paper, text-ink, border-rust etc.
+   `inline` so utilities track the light/dark custom properties above. */
+@theme inline {
+    --color-paper: var(--tone-paper);
+    --color-surface: var(--tone-surface);
+    --color-card: var(--tone-card);
+    --color-sky: var(--tone-sky);
+    --color-ink: var(--tone-ink);
+    --color-ink-muted: var(--tone-ink-muted);
+    --color-rust: var(--tone-rust);
+    --color-rust-tint: var(--tone-rust-tint);
+    --color-leaf: var(--tone-leaf);
+    --color-leaf-bright: var(--tone-leaf-bright);
+    --color-leaf-deep: var(--tone-leaf-deep);
 }
 
 @layer base {
