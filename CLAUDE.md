@@ -6,8 +6,10 @@ v2 based on new Figma designs.
 
 Project notes, briefs and Nick's profile/preferences live in
 `~/Projects/cc-websites/` – read `ncktrnr-v2-brief.md` there for goals and
-status. Writing conventions (en dashes, UK spelling, sentence case) are in
-that folder's CLAUDE.md and apply to all copy.
+status, and `ncktrnr-v2-design-build-plan.md` for the v2 build plan
+(canonical Figma frames, milestones M0–M5, motion/parallax approach, agreed
+decisions). Writing conventions (en dashes, UK spelling, sentence case) are
+in that folder's CLAUDE.md and apply to all copy.
 
 ## Stack and layout
 
