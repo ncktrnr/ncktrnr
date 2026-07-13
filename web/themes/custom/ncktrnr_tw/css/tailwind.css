@@ -109,11 +109,13 @@
 
 @layer base {
     html {
-        font-family: var(--font-sans); 
+        font-family: var(--font-sans);
   }
 
     body {
-        font-family: var(--font-body); 
+        font-family: var(--font-body);
+        background-color: var(--tone-paper);
+        color: var(--tone-ink);
   }
 
     h1, h2, h3, h4, h5, h6 {
@@ -148,16 +150,16 @@
     font-family: var(--font-display);
   }
 
-    /* Navigation container */
-  .primary-nav { 
-    @apply flex items-center mx-auto max-w-2xl justify-between rounded-full border-2 border-neutral-500 bg-white px-8 py-4; 
-     
+    /* Navigation pill – rust tint over whatever scrolls beneath (Figma 151:5678).
+       Blur is on trial per decision 6: drop it if it fights the hero. */
+  .primary-nav {
+    @apply flex items-center mx-auto max-w-2xl justify-between rounded-full bg-rust-tint px-8 py-4 backdrop-blur-md;
     }
-  .primary-nav a { 
-    @apply text-neutral-900 rounded-md inline-flex items-center; 
+  .primary-nav a {
+    @apply text-ink rounded-md inline-flex items-center;
     }
-  .primary-nav a:focus-visible { 
-    outline: 1px solid #111827; outline-offset: 2px; 
+  .primary-nav a:focus-visible {
+    outline: 1px solid var(--tone-ink); outline-offset: 2px;
     }
 
     /* Anchor stays full width for reliable clicks */
