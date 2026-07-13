@@ -1,0 +1,24 @@
+uuid: 7c4f00a3-e643-4b65-bc21-a8afac775a79
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_screenshots
+    - media.type.image
+    - node.type.case_study
+id: node.case_study.field_screenshots
+field_name: field_screenshots
+entity_type: node
+bundle: case_study
+label: Screenshots
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+field_type: entity_reference

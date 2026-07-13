@@ -1,0 +1,19 @@
+uuid: aa6cdf17-c614-4f06-9962-eec75f220292
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.case_study
+id: node.case_study.field_description
+field_name: field_description
+entity_type: node
+bundle: case_study
+label: Summary
+description: 'One or two sentences for the top of the card.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long
