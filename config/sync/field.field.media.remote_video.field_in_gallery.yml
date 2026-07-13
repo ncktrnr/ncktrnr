@@ -1,0 +1,21 @@
+uuid: 1e7fd26f-4580-4dd1-8c07-6c01c5c83dca
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_in_gallery
+    - media.type.remote_video
+id: media.remote_video.field_in_gallery
+field_name: field_in_gallery
+entity_type: media
+bundle: remote_video
+label: 'Show in gallery'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'In gallery'
+  off_label: 'Not in gallery'
+field_type: boolean

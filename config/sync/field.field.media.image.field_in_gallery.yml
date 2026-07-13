@@ -1,0 +1,21 @@
+uuid: 7e216a42-4e61-4bd0-9e2d-37691c65b7ea
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_in_gallery
+    - media.type.image
+id: media.image.field_in_gallery
+field_name: field_in_gallery
+entity_type: media
+bundle: image
+label: 'Show in gallery'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'In gallery'
+  off_label: 'Not in gallery'
+field_type: boolean

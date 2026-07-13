@@ -3,11 +3,15 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.image.field_caption
+    - field.field.media.image.field_gallery_link
+    - field.field.media.image.field_in_gallery
     - field.field.media.image.field_media_image
     - image.style.large
     - media.type.image
   module:
-    - image
+    - link
+    - svg_image
 _core:
   default_config_hash: t2YAVeSqMs3Gpnfp_plCnQ2TsoC0u57VCUWl8e2jMMM
 id: media.image.default
@@ -15,12 +19,33 @@ targetEntityType: media
 bundle: image
 mode: default
 content:
+  field_caption:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+      link_rel: canonical
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_gallery_link:
+    type: link
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 11
+    region: content
   field_media_image:
     type: image
     label: visually_hidden
     settings:
-      image_style: large
       image_link: ''
+      image_style: large
       image_loading:
         attribute: lazy
     third_party_settings: {  }
@@ -28,6 +53,7 @@ content:
     region: content
 hidden:
   created: true
+  field_in_gallery: true
   name: true
   thumbnail: true
   uid: true

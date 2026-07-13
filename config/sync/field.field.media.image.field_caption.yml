@@ -1,0 +1,19 @@
+uuid: 536e7b0b-f5a0-45f3-9dc7-e4f23fe58610
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_caption
+    - media.type.image
+id: media.image.field_caption
+field_name: field_caption
+entity_type: media
+bundle: image
+label: Caption
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
