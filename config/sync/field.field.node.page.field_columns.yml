@@ -1,0 +1,22 @@
+uuid: 8b87f082-722b-4e4f-b272-7958035ee3e0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_columns
+    - node.type.page
+  module:
+    - text
+id: node.page.field_columns
+field_name: field_columns
+entity_type: node
+bundle: page
+label: Columns
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long
