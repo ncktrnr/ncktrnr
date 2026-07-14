@@ -83,17 +83,8 @@
     --font-body: var(--font-sans);
     --font-display: var(--font-sans);
 
-    /* type scale – Figma sizes; line heights chosen for Geist Mono */
-    --text-display: 2.25rem;            /* 36px – page headings */
-    --text-display--line-height: 1.2;
-    --text-heading: 1.5rem;             /* 24px – section/card headings */
-    --text-heading--line-height: 1.3;
-    --text-lede: 1.25rem;               /* 20px – intro/lede + nav */
-    --text-lede--line-height: 1.5;
-    --text-small: 1.125rem;             /* 18px – secondary/tag lines */
-    --text-small--line-height: 1.5;
-    --text-tiny: 1rem;                  /* 16px – footer small print */
-    --text-tiny--line-height: 1.5;
+    /* Type sizes use the stock Tailwind scale – the Figma sizes map exactly:
+       36px text-4xl · 24px text-2xl · 20px text-xl · 18px text-lg · 16px text-base */
 
     /* radii – Figma rounded rectangles */
     --radius-card: 2.25rem;  /* 36px – cards, intro box */
@@ -138,8 +129,10 @@
 
 @layer components {
     :root {
-    --logo-abbr-fallback: 7ch; 
+    --logo-abbr-fallback: 7ch;
     --logo-full-fallback: 12.6ch;
+    /* rendered header height: container p-4 + pill py-4 + 20px logo line */
+    --header-h: 6.75rem;
     }
 
     .typography {
@@ -172,82 +165,46 @@
     }
 
     /* -----------------------------------------------------------------------
-       Hero garden (page--front.html.twig). Sky gradients reproduce Nick's
-       Illustrator exports exactly (hero-parallax/SVG/bg-light + bg-dark);
-       the day gradient's far stop sits above the visible canvas, hence 133%.
-       Layers share a 1920×1080 viewBox, bottom-aligned, top cropped by the
-       hero's height. Static for M2 – parallax + crossfade arrive in M4.
+       Front-page hero (page--front.html.twig). Positioning and sizing live
+       as utilities in the template; only what utilities can't express
+       cleanly is defined here:
+       – sky gradients, rebuilt from the Illustrator exports
+         (hero-parallax/SVG/bg-light + bg-dark). They are sized to the
+         layers' virtual 1920×1080 canvas (56.25% of width) and
+         bottom-anchored, so the hero crops sky and garden together; the
+         day gradient's far stop sits above the crop, hence 133%
+       – the --night swap: the `dark:` variant only matches the manual
+         data-theme override, not system dark, so day/night opacity keys
+         off the --night token (which also gives M4 its crossfade)
     ----------------------------------------------------------------------- */
     .hero {
-        position: relative;
-        overflow: hidden;
-        height: clamp(26rem, 38vw, 45rem);
-        /* Sit behind the sticky nav pill so the garden runs to the page top.
-           6.75rem = the rendered header: container p-4 + pill py-4 + 20px logo */
-        margin-top: calc(-1 * var(--header-h, 6.75rem));
+        /* pull up behind the sticky nav so the sky runs to the page top */
+        margin-top: calc(-1 * var(--header-h));
         background-image: linear-gradient(to top, #eef9ff 0%, #78ddfa 133%);
-        /* Size the gradient to the layers' virtual 1920×1080 canvas (56.25%
-           of their width), bottom-anchored, so the hero crops the sky exactly
-           as it crops the garden – the visible band is the palest part. */
         background-size: 100% max(56.25vw, 31.5rem);
         background-position: bottom;
         background-repeat: no-repeat;
     }
-    .hero__night {
-        position: absolute;
-        inset: 0;
+    .hero-night {
         background-image: linear-gradient(to bottom, #030b2f 0%, #0a1f43 29%, #0f2144 41%, #1f2748 57%, #3a3250 74%, #5f415a 93%, #6e485e 100%);
         background-size: 100% max(56.25vw, 31.5rem);
         background-position: bottom;
         background-repeat: no-repeat;
         opacity: var(--night);
     }
-    .hero__layer {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        /* Never narrower than 56rem, so the garden stays readable on small
-           screens instead of shrinking to a strip */
-        width: max(100%, 56rem);
-        max-width: none;
-        height: auto;
-        pointer-events: none;
-    }
-    .hero__layer--light { opacity: calc(1 - var(--night)); }
-    .hero__layer--dark { opacity: var(--night); }
+    .layer-day { opacity: calc(1 - var(--night)); }
+    .layer-night { opacity: var(--night); }
 
-    /* Intro box – rust border on sky (Figma 151:10). The left offset eases
-       from Figma's 20% down to 1rem as the viewport approaches the box's
-       max-width, so it never hangs off the right edge. */
-    .hero__intro {
-        @apply rounded-card border border-rust bg-sky p-6 md:p-8;
-        position: absolute;
-        top: 22%;
-        left: clamp(1rem, calc((100% - 40rem) * 0.4), 20%);
-        right: 1rem;
-        max-width: 40rem;
+    /* Below md the hero grows with the in-flow intro box (see template)
+       and is taller than the layer canvas, so the sky stretches to fill */
+    @media (width < 48rem) {
+        .hero,
+        .hero-night { background-size: 100% 100%; }
     }
 
-    /* Small screens (draft – the proper mobile pass is the M2 iteration 4):
-       the box joins the flow so the hero grows with the text, garden below */
-    @media (max-width: 44rem) {
-        .hero {
-            height: auto;
-            padding-top: calc(var(--header-h, 6.75rem) + 1rem);
-            padding-bottom: 15rem;
-            /* Taller than the layer canvas here, so let the sky fill it */
-            background-size: 100% 100%;
-        }
-        .hero__night { background-size: 100% 100%; }
-        .hero__intro {
-            position: relative; /* keeps it painting above the abs-positioned layers */
-            top: auto;
-            left: auto;
-            right: auto;
-            margin-inline: 1rem;
-        }
-    }
+    /* Theme toggle – the same --night token swaps the icons */
+    .theme-toggle .tt-sun { opacity: var(--night); }
+    .theme-toggle .tt-moon { opacity: calc(1 - var(--night)); }
 
     /* Anchor stays full width for reliable clicks */
     .logo {
