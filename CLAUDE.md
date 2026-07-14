@@ -49,3 +49,19 @@ commit the diff in `config/sync/` with the related code.
   blank-site checklist).
 - Deploys only from a clean, pushed `main` – the script enforces this.
 - SQL dumps and `backups/` are gitignored; never commit database dumps.
+
+## Theme conventions (v2, July 2026)
+
+- Tailwind utilities in templates over custom CSS; custom CSS only with a
+  stated justification (see the hero block in `css/tailwind.css`). Round
+  Figma values to the nearest stock utility – Figma is a starting point.
+- Standard heading sizes for h2/h3 live in `@layer base`; editor-entered
+  field markup is styled from templates with `[&_…]` descendant utilities.
+- SVG assets are SVGO'd on the way into the theme (lossless minification,
+  viewBox kept): `npx svgo --multipass -i in.svg -o images/…/out.svg`.
+- Homepage copy lives in fields on the Home node (field_intro,
+  field_columns, field_connect, field_content = columns heading);
+  `page--front.html.twig` owns the front-page layout.
+- Scroll-driven CSS animations (hero parallax) do not run in Claude's
+  embedded preview pane – verify in a real browser. Inside the
+  overflow-hidden hero, use `scroll(root)`, never bare `scroll()`.
