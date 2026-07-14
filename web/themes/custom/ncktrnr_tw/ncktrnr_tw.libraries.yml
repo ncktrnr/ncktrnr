@@ -121,6 +121,12 @@ logo_nav:
       attributes:
         defer: true
 
+theme_toggle:
+  js:
+    js/theme-toggle.js:
+      attributes:
+        defer: true
+
 lottie_player:
   js:
     https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js: { type: external, minified: true, attributes: { defer: true } }
