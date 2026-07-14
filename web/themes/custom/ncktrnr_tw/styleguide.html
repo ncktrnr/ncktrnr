@@ -34,22 +34,22 @@
   <!-- Surfaces in context -->
   <section class="mb-16">
     <h2 class="text-2xl font-bold mb-6">Surfaces</h2>
-    <div class="bg-sky rounded-card p-8 mb-4">
+    <div class="bg-sky rounded-[2.25rem] p-8 mb-4">
       <p class="text-base text-ink-muted mb-4">sky – hero</p>
-      <div class="border border-rust rounded-card bg-transparent p-6 max-w-xl">
+      <div class="border border-rust rounded-[2.25rem] bg-transparent p-6 max-w-xl">
         <p class="text-xl font-bold"><span class="text-rust">Hi, I’m Nick</span> 👋</p>
-        <p class="text-xl mt-4">Intro box – rust border on sky, radius-card (36px).</p>
+        <p class="text-xl mt-4">Intro box – rust border on sky, rounded-[2.25rem] (36px).</p>
       </div>
     </div>
-    <div class="bg-surface rounded-card p-8">
+    <div class="bg-surface rounded-[2.25rem] p-8">
       <p class="text-base text-ink-muted mb-4">surface – inner pages</p>
       <div class="grid md:grid-cols-2 gap-6">
-        <div class="bg-card rounded-card p-6">
-          <div class="bg-sky rounded-tile h-32 mb-4"></div>
+        <div class="bg-card rounded-[2.25rem] p-6">
+          <div class="bg-sky rounded-[1.6875rem] h-32 mb-4"></div>
           <p class="text-2xl font-bold">Work card</p>
-          <p class="text-lg text-ink-muted mt-2">card on surface, radius-card; tile radius (27px) on the screenshot</p>
+          <p class="text-lg text-ink-muted mt-2">card on surface, rounded-[2.25rem]; tile rounded-[1.6875rem] (27px) on the screenshot</p>
         </div>
-        <div class="bg-card rounded-card p-6">
+        <div class="bg-card rounded-[2.25rem] p-6">
           <p class="text-2xl font-bold text-rust">Define</p>
           <p class="text-xl mt-3">Get clear on goals, audiences, and content</p>
           <p class="text-lg text-ink-muted mt-3">Research · discovery workshops · information architecture · content models</p>
@@ -100,7 +100,7 @@
     for (const t of tones) {
       const el = document.createElement('div');
       el.innerHTML = `
-        <div class="h-20 rounded-tile border border-ink-muted/30" style="background: var(--tone-${t})"></div>
+        <div class="h-20 rounded-[1.6875rem] border border-ink-muted/30" style="background: var(--tone-${t})"></div>
         <p class="text-base mt-2">${t}</p>
         <p class="text-base text-ink-muted" data-tone="${t}"></p>`;
       grid.appendChild(el);

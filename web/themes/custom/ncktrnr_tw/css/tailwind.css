@@ -86,9 +86,9 @@
     /* Type sizes use the stock Tailwind scale – the Figma sizes map exactly:
        36px text-4xl · 24px text-2xl · 20px text-xl · 18px text-lg · 16px text-base */
 
-    /* radii – Figma rounded rectangles */
-    --radius-card: 2.25rem;  /* 36px – cards, intro box */
-    --radius-tile: 1.6875rem;/* 27px – screenshots/gallery tiles */
+    /* Radii use arbitrary values in the templates – Figma's rounded
+       rectangles are 36px (cards, intro box: rounded-[2.25rem]) and
+       27px (screenshot/gallery tiles: rounded-[1.6875rem]) */
 }
 
 /* Semantic colours – exposed as bg-paper, text-ink, border-rust etc.

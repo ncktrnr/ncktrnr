@@ -40,8 +40,6 @@
     --default-mono-font-family: var(--font-mono);
     --font-body: var(--font-sans);
     --font-display: var(--font-sans);
-    --radius-card: 2.25rem;
-    --radius-tile: 1.6875rem;
   }
 }
 @layer base {
@@ -223,8 +221,14 @@
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
+  .top-1\/2 {
+    top: calc(1/2 * 100%);
+  }
   .top-\[22\%\] {
     top: 22%;
+  }
+  .right-6 {
+    right: calc(var(--spacing) * 6);
   }
   .right-10 {
     right: calc(var(--spacing) * 10);
@@ -769,6 +773,10 @@
     --tw-translate-x: calc(calc(1/2 * 100%) * -1);
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
+  .-translate-y-1\/2 {
+    --tw-translate-y: calc(calc(1/2 * 100%) * -1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
@@ -809,20 +817,23 @@
       margin-block-end: calc(calc(var(--spacing) * 6) * calc(1 - var(--tw-space-y-reverse)));
     }
   }
+  .gap-x-4 {
+    column-gap: calc(var(--spacing) * 4);
+  }
   .overflow-hidden {
     overflow: hidden;
   }
   .rounded {
     border-radius: 0.25rem;
   }
-  .rounded-card {
-    border-radius: var(--radius-card);
+  .rounded-\[1\.6875rem\] {
+    border-radius: 1.6875rem;
+  }
+  .rounded-\[2\.25rem\] {
+    border-radius: 2.25rem;
   }
   .rounded-full {
     border-radius: calc(infinity * 1px);
-  }
-  .rounded-tile {
-    border-radius: var(--radius-tile);
   }
   .border {
     border-style: var(--tw-border-style);
@@ -968,10 +979,6 @@
   .underline {
     text-decoration-line: underline;
   }
-  .blur {
-    --tw-blur: blur(8px);
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
-  }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
@@ -1086,6 +1093,11 @@
   .max-md\:pt-\[calc\(var\(--header-h\)\+1rem\)\] {
     @media (width < 48rem) {
       padding-top: calc(var(--header-h) + 1rem);
+    }
+  }
+  .max-md\:pr-14 {
+    @media (width < 48rem) {
+      padding-right: calc(var(--spacing) * 14);
     }
   }
   .max-md\:pb-60 {
