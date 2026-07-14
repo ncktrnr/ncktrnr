@@ -86,9 +86,9 @@
     /* Type sizes use the stock Tailwind scale – the Figma sizes map exactly:
        36px text-4xl · 24px text-2xl · 20px text-xl · 18px text-lg · 16px text-base */
 
-    /* Radii use arbitrary values in the templates – Figma's rounded
-       rectangles are 36px (cards, intro box: rounded-[2.25rem]) and
-       27px (screenshot/gallery tiles: rounded-[1.6875rem]) */
+    /* Radii use the nearest stock utilities (2026-07-14: Figma is a
+       starting point, round to stock Tailwind) – cards/intro rounded-4xl,
+       screenshot/gallery tiles rounded-3xl */
 }
 
 /* Semantic colours – exposed as bg-paper, text-ink, border-rust etc.
@@ -121,6 +121,11 @@
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--font-display);
   }
+
+    /* Standard heading hierarchy (agreed 2026-07-14) – templates and editor
+       content share consistent sizes, no per-instance overrides */
+    h2 { @apply text-2xl font-bold; }
+    h3 { @apply text-xl font-bold; }
 
   p, span, a, li, ol, strong, em, b, i {
     font-family: var(--font-body);
@@ -205,6 +210,31 @@
     /* Theme toggle – the same --night token swaps the icons */
     .theme-toggle .tt-sun { opacity: var(--night); }
     .theme-toggle .tt-moon { opacity: calc(1 - var(--night)); }
+
+    /* M4 taster (2026-07-14): far layers lag behind the scroll, so the
+       garden pulls apart in depth as the hero leaves the viewport – back
+       lags most, top travels with the page. The keyframe animates
+       `transform`, which composes with the utility centring (v4's
+       -translate-x-1/2 uses the separate `translate` property).
+       Scroll-driven animation: Chrome/Edge/Safari 26+; other browsers stay
+       static – the intended fallback. Full treatment incl. the manual
+       motion toggle lands in M4. */
+    @supports (animation-timeline: scroll()) {
+        @media (prefers-reduced-motion: no-preference) {
+            .parallax-back,
+            .parallax-mid {
+                animation: hero-lag linear both;
+                /* scroll(root), not scroll(): the hero's overflow-hidden
+                   makes it the 'nearest scroller', which never scrolls */
+                animation-timeline: scroll(root);
+            }
+            .parallax-back { --lag: 110px; }
+            .parallax-mid { --lag: 55px; }
+        }
+    }
+    @keyframes hero-lag {
+        to { transform: translateY(var(--lag)); }
+    }
 
     /* Anchor stays full width for reliable clicks */
     .logo {
