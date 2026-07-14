@@ -210,6 +210,9 @@
   .relative {
     position: relative;
   }
+  .static {
+    position: static;
+  }
   .sticky {
     position: sticky;
   }
@@ -1251,6 +1254,7 @@
   --tone-leaf: #57a636;
   --tone-leaf-bright: #a4d43d;
   --tone-leaf-deep: #476841;
+  --night: 0;
 }
 [data-theme="dark"] {
   --tone-paper: #181511;
@@ -1267,6 +1271,7 @@
   --tone-leaf: #6dbb4a;
   --tone-leaf-bright: #b6de5a;
   --tone-leaf-deep: #86a878;
+  --night: 1;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
@@ -1284,6 +1289,7 @@
     --tone-leaf: #6dbb4a;
     --tone-leaf-bright: #b6de5a;
     --tone-leaf-deep: #86a878;
+    --night: 1;
   }
 }
 @layer base {
@@ -1339,6 +1345,75 @@
   .primary-nav a:focus-visible {
     outline: 1px solid var(--tone-ink);
     outline-offset: 2px;
+  }
+  .hero {
+    position: relative;
+    overflow: hidden;
+    height: clamp(26rem, 38vw, 45rem);
+    margin-top: calc(-1 * var(--header-h, 6.75rem));
+    background-image: linear-gradient(to top, #eef9ff 0%, #78ddfa 133%);
+    background-size: 100% max(56.25vw, 31.5rem);
+    background-position: bottom;
+    background-repeat: no-repeat;
+  }
+  .hero__night {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(to bottom, #030b2f 0%, #0a1f43 29%, #0f2144 41%, #1f2748 57%, #3a3250 74%, #5f415a 93%, #6e485e 100%);
+    background-size: 100% max(56.25vw, 31.5rem);
+    background-position: bottom;
+    background-repeat: no-repeat;
+    opacity: var(--night);
+  }
+  .hero__layer {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max(100%, 56rem);
+    max-width: none;
+    height: auto;
+    pointer-events: none;
+  }
+  .hero__layer--light {
+    opacity: calc(1 - var(--night));
+  }
+  .hero__layer--dark {
+    opacity: var(--night);
+  }
+  .hero__intro {
+    border-radius: var(--radius-card);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--tone-rust);
+    background-color: var(--tone-sky);
+    padding: calc(var(--spacing) * 6);
+    @media (width >= 48rem) {
+      padding: calc(var(--spacing) * 8);
+    }
+    position: absolute;
+    top: 22%;
+    left: clamp(1rem, calc((100% - 40rem) * 0.4), 20%);
+    right: 1rem;
+    max-width: 40rem;
+  }
+  @media (max-width: 44rem) {
+    .hero {
+      height: auto;
+      padding-top: calc(var(--header-h, 6.75rem) + 1rem);
+      padding-bottom: 15rem;
+      background-size: 100% 100%;
+    }
+    .hero__night {
+      background-size: 100% 100%;
+    }
+    .hero__intro {
+      position: relative;
+      top: auto;
+      left: auto;
+      right: auto;
+      margin-inline: 1rem;
+    }
   }
   .logo {
     font-size: 20px;

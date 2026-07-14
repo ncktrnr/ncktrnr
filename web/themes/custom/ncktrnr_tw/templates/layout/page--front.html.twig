@@ -1,0 +1,63 @@
+{#
+/**
+ * @file
+ * Front page – the template owns the layout (M2 decision, 13 July 2026):
+ * layout builder is bypassed on home only, inner pages keep page.html.twig.
+ * Homepage copy is hard-coded here for now; the markdown drafts stay the
+ * source, copy can be lifted into fields later if admin editing matters.
+ *
+ * Hero garden: sky is a CSS gradient (see .hero in css/tailwind.css);
+ * the three depth layers are <img> SVGs in images/hero/, bottom-aligned,
+ * static until M4 adds parallax. Light/dark variants both render and swap
+ * via the --night token so M4 can crossfade day to night.
+ */
+#}
+{{ attach_library('ncktrnr_tw/logo_nav') }}
+{{ attach_library('ncktrnr_tw/lottie_player') }}
+<div class="layout-container">
+
+  <header role="banner" class="sticky top-0 z-40">
+    {{ page.header }}
+
+    {% include '@ncktrnr_tw/includes/logo-nav.html.twig' %}
+
+  </header>
+
+  {{ page.breadcrumb }}
+
+  {{ page.highlighted }}
+
+  {{ page.help }}
+
+  <main role="main">
+    <a id="main-content" tabindex="-1"></a>{# link is in html.html.twig #}
+
+    <section class="hero" aria-labelledby="intro-heading">
+      <div class="hero__night" aria-hidden="true"></div>
+      <img class="hero__layer hero__layer--light" src="/themes/custom/ncktrnr_tw/images/hero/back-light.svg" alt="" width="1920" height="1080">
+      <img class="hero__layer hero__layer--dark" src="/themes/custom/ncktrnr_tw/images/hero/back-dark.svg" alt="" width="1920" height="1080">
+      <img class="hero__layer" src="/themes/custom/ncktrnr_tw/images/hero/middle.svg" alt="" width="1920" height="1080">
+      <img class="hero__layer" src="/themes/custom/ncktrnr_tw/images/hero/top.svg" alt="" width="1920" height="1080">
+
+      <div class="hero__intro">
+        <h1 id="intro-heading" class="text-lede font-bold text-rust">Hi, I'm Nick <span aria-hidden="true">👋</span></h1>
+        <p class="mt-4 text-small">I help people tell their stories online, from ideas to impact. I enjoy design, illustration, and have fun animating.</p>
+        <p class="mt-4 text-small">Since around 2005, I've been building easy-to-use websites and collaborating with non-profits and like-minded people – connecting ideas and ensuring the message reaches and resonates with the right audience.</p>
+      </div>
+    </section>
+
+    {# Iteration 3 lands here: Define/Create/Communicate columns + Let's connect #}
+
+  </main>
+
+  {% if page.footer %}
+    <footer role="contentinfo" class="relative border-t-2 border-neutral-600 min-h-24">
+    <div class="absolute -top-17 right-10">
+      <lottie-player src="/themes/custom/ncktrnr_tw/lottie/dino.json" background="transparent" speed="1" style="width: 200px; height: 80px;" loop hover autoplay></lottie-player>
+      <noscript>{% include '@ncktrnr_tw/images/dino-vegan.svg' %}</noscript>
+    </div>
+      {{ page.footer }}
+    </footer>
+  {% endif %}
+
+</div>{# /.layout-container #}
