@@ -31,7 +31,10 @@
 {% if content %}
   <div{{ attributes.addClass(classes) }}>
     {{ content }}
-    <div>©{{ 'now' | date('Y') }} ncktrnr</div>
+    <div class="flex gap-x-4">
+      <div>©{{ 'now' | date('Y') }} ncktrnr</div>
+      <div>Made with plants, 100% vegan</div>
+    </div>
   </div>
  
 {% endif %}
