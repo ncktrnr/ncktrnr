@@ -1713,7 +1713,7 @@
   .dragonfly-hero [id^="dfly-wing"] {
     transform-box: fill-box;
     transform-origin: center;
-    animation: dfly-flutter 6s ease-in-out infinite;
+    animation: dfly-flutter 5s ease-in-out infinite;
   }
   @keyframes dfly-bob {
     to {
@@ -1721,13 +1721,13 @@
     }
   }
   @keyframes dfly-flutter {
-    0%, 4%, 8% {
+    0%, 5%, 10%, 15%, 20% {
       transform: scaleX(1);
     }
-    2%, 6%, 10% {
-      transform: scaleX(0.85);
+    2.5%, 7.5%, 12.5%, 17.5%, 22.5% {
+      transform: scaleX(0.7);
     }
-    12%, 100% {
+    25%, 100% {
       transform: scaleX(1);
     }
   }
