@@ -160,7 +160,7 @@
     /* Navigation pill – rust tint over whatever scrolls beneath (Figma 151:5678).
        Blur is on trial per decision 6: drop it if it fights the hero. */
   .primary-nav {
-    @apply flex items-center mx-auto max-w-2xl justify-between rounded-full bg-rust-tint px-8 py-4 backdrop-blur-md;
+    @apply flex items-center mx-auto max-w-2xl justify-between rounded-full bg-rust-tint px-6 py-4 backdrop-blur-md md:px-8;
     }
   .primary-nav a {
     @apply text-ink rounded-md inline-flex items-center;
@@ -255,8 +255,15 @@
     .logo:hover .reveal,
     .logo:focus-visible .reveal { width: var(--full-w, var(--logo-full-fallback)); }
 
-    /* Track spans full width to avoid cropping */
-    .logo .track { position: relative; display: block; line-height: 1; height: 1em; width: var(--full-w, var(--logo-full-fallback)); }
+    /* The reveal's fixed height stops the pill moving while fonts swap –
+       fallback-font line metrics differ from Geist Mono's by a few px */
+    .logo .reveal { height: 1em; }
+
+    /* Track spans full width to avoid cropping. Hidden until the JS has
+       built it: pre-build the empty track is a second 1em block under the
+       fallback text, briefly doubling the logo's height on every load */
+    .logo .track { position: relative; display: none; line-height: 1; height: 1em; width: var(--full-w, var(--logo-full-fallback)); }
+    .logo.is-built .track { display: block; }
 
     /* Kept letters: slight stagger so width starts first, then slide */
     .logo .char { position: absolute; top: 0; left: 0; transform: translateX(var(--dx, 0)); }
@@ -272,17 +279,52 @@
     .logo .fallback { display: inline; }
     .logo.is-built .fallback { display: none; } /* hide once JS has built the animated letters */
 
-    /* Touch (no hover): always show full */
-    @media (hover: none) {
+    /* Touch (no hover): show the full name where the pill has room for it.
+       Below md the abbreviated mark stays – 'nick turner' plus the nav links
+       overflows the pill at phone widths */
+    @media (hover: none) and (width >= 48rem) {
         .logo .reveal { width: var(--full-w, var(--logo-full-fallback)); }
         .logo .char.keep { transform: translateX(0); }
         .logo .char.missing { opacity: 1; }
     }
 
-    /* Reduced motion */
+    /* Reduced motion: no reveal animation. The static full-name layout needs
+       mask width and letter positions to agree, so it is gated to widths
+       that fit it – below that the abbreviated resting state applies */
     @media (prefers-reduced-motion: reduce) {
-        .logo .reveal { transition: none; width: var(--full-w, var(--logo-full-fallback)); }
-        .logo .char { transition: none !important; transform: translateX(0) !important; opacity: 1 !important; }
+        .logo .reveal { transition: none; }
+        .logo .char { transition: none !important; }
+        @media (width >= 48rem) {
+            .logo .reveal { width: var(--full-w, var(--logo-full-fallback)); }
+            .logo .char { transform: translateX(0) !important; opacity: 1 !important; }
+        }
+    }
+
+    /* -----------------------------------------------------------------------
+       Dragonflies (2026-07-15). Hero fly perches on the intro box: wings
+       shimmer in short bursts (scaleX around each wing's own centre reads
+       as flutter at this amplitude) and the whole fly bobs gently – both
+       are keyframes, which utilities can't express. Footer fly is static
+       line art; its baked black/white is remapped to the theme tokens so
+       it reads in both modes.
+    ----------------------------------------------------------------------- */
+    .dragonfly-hero { animation: dfly-bob 4s ease-in-out infinite alternate; }
+    .dragonfly-hero [id^="dfly-wing"] {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: dfly-flutter 6s ease-in-out infinite;
+    }
+    @keyframes dfly-bob {
+        to { transform: translateY(3px); }
+    }
+    @keyframes dfly-flutter {
+        0%, 4%, 8% { transform: scaleX(1); }
+        2%, 6%, 10% { transform: scaleX(0.85); }
+        12%, 100% { transform: scaleX(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .dragonfly-hero,
+        .dragonfly-hero [id^="dfly-wing"] { animation: none; }
     }
 
       /* High-contrast and forced-colors adjustments */
@@ -297,6 +339,13 @@
     }
 
 }
+
+/* Footer dragonfly recolour – deliberately outside @layer: the inlined
+   SVG's own <style> is un-layered, and un-layered CSS beats any layer, so
+   these must be un-layered too (they then win on specificity) */
+.footer-fly .ffly-1 { fill: var(--tone-paper); stroke: var(--tone-ink); }
+.footer-fly .ffly-2 { stroke: var(--tone-ink); }
+.footer-fly circle:not(.ffly-1) { fill: var(--tone-ink); }
 
 @layer utilities {
 
