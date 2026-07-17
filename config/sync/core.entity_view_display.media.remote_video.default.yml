@@ -3,9 +3,13 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.remote_video.field_caption
+    - field.field.media.remote_video.field_gallery_link
+    - field.field.media.remote_video.field_in_gallery
     - field.field.media.remote_video.field_media_oembed_video
     - media.type.remote_video
   module:
+    - link
     - media
 _core:
   default_config_hash: ZdPcl2hPxl5pgv3pI-07R7h51OjeUeKJTy-ab1NfM34
@@ -14,6 +18,27 @@ targetEntityType: media
 bundle: remote_video
 mode: default
 content:
+  field_caption:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+      link_rel: canonical
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_gallery_link:
+    type: link
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 11
+    region: content
   field_media_oembed_video:
     type: oembed
     label: hidden
@@ -27,6 +52,7 @@ content:
     region: content
 hidden:
   created: true
+  field_in_gallery: true
   name: true
   thumbnail: true
   uid: true

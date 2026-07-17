@@ -3,9 +3,12 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.page.field_columns
+    - field.field.node.page.field_connect
     - field.field.node.page.field_content
     - field.field.node.page.field_description
     - field.field.node.page.field_featured_image
+    - field.field.node.page.field_intro
     - field.field.node.page.field_tags
     - field.field.node.page.layout_builder__layout
     - node.type.page
@@ -87,6 +90,51 @@ third_party_settings:
                 third_party_settings: {  }
             weight: 4
             additional: {  }
+          10209e8b-306e-45ed-9b57-919683746df7:
+            uuid: 10209e8b-306e-45ed-9b57-919683746df7
+            region: content
+            configuration:
+              id: 'field_block:node:page:field_intro'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: text_default
+                label: above
+                settings: {  }
+                third_party_settings: {  }
+            weight: 5
+            additional: {  }
+          5419e512-7306-4cc0-9eee-69e11a7ab5da:
+            uuid: 5419e512-7306-4cc0-9eee-69e11a7ab5da
+            region: content
+            configuration:
+              id: 'field_block:node:page:field_columns'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: text_default
+                label: above
+                settings: {  }
+                third_party_settings: {  }
+            weight: 6
+            additional: {  }
+          d80f0f67-dfc2-41c0-8c9d-2855c09bc0f9:
+            uuid: d80f0f67-dfc2-41c0-8c9d-2855c09bc0f9
+            region: content
+            configuration:
+              id: 'field_block:node:page:field_connect'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: text_default
+                label: above
+                settings: {  }
+                third_party_settings: {  }
+            weight: 7
+            additional: {  }
         third_party_settings: {  }
 _core:
   default_config_hash: rVDjFcG7a9eUsRsMS1vdA6OQgJ77pZjEPmk1fIuADao
@@ -99,6 +147,20 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: -20
+    region: content
+  field_columns:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  field_connect:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 103
     region: content
   field_content:
     type: text_default
@@ -115,6 +177,13 @@ content:
       link: false
     third_party_settings: {  }
     weight: 1
+    region: content
+  field_intro:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 101
     region: content
 hidden:
   field_description: true

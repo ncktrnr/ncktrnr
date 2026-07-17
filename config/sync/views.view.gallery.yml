@@ -1,0 +1,86 @@
+uuid: 22e68603-d914-40d8-a842-198169204bf3
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.full
+  module:
+    - media
+    - user
+id: gallery
+label: Gallery
+module: views
+description: 'Media flagged for the work-page gallery – newest first.'
+tag: ''
+base_table: media_field_data
+base_field: mid
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      title: Gallery
+      pager:
+        type: none
+        options:
+          offset: 0
+      access:
+        type: perm
+        options:
+          perm: 'view media'
+      cache:
+        type: tag
+        options: {  }
+      sorts:
+        created:
+          id: created
+          table: media_field_data
+          field: created
+          entity_type: media
+          entity_field: created
+          plugin_id: date
+          order: DESC
+      filters:
+        status:
+          id: status
+          table: media_field_data
+          field: status
+          entity_type: media
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+        field_in_gallery_value:
+          id: field_in_gallery_value
+          table: media__field_in_gallery
+          field: field_in_gallery_value
+          plugin_id: boolean
+          value: '1'
+      style:
+        type: default
+        options: {  }
+      row:
+        type: 'entity:media'
+        options:
+          view_mode: full
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - user.permissions
+      tags: {  }
+  block_1:
+    id: block_1
+    display_title: Block
+    display_plugin: block
+    position: 1
+    display_options:
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - user.permissions
+      tags: {  }

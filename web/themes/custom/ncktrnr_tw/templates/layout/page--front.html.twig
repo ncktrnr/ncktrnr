@@ -1,0 +1,138 @@
+{#
+/**
+ * @file
+ * Front page – the template owns the layout (M2 decision, 13 July 2026):
+ * layout builder is bypassed on home only, inner pages keep page.html.twig.
+ * Copy lives in fields on the Home node (field_intro, field_columns,
+ * field_connect + field_content for the columns heading) – the template
+ * renders field markup and styles it with descendant utilities, since
+ * editor content can't carry classes.
+ *
+ * Hero garden: sky is a CSS gradient (see .hero in css/tailwind.css);
+ * the three depth layers are <img> SVGs in images/hero/, bottom-aligned.
+ * A scroll-driven parallax taster runs where supported (parallax-back/-mid,
+ * see tailwind.css) – the full motion pass is M4. Light/dark variants both
+ * render and swap via the --night token so M4 can crossfade day to night.
+ * Headings h2/h3 take the standard sizes set in @layer base.
+ */
+#}
+{{ attach_library('ncktrnr_tw/logo_nav') }}
+{{ attach_library('ncktrnr_tw/lottie_player') }}
+<div class="layout-container">
+
+  <header role="banner" class="sticky top-0 z-40">
+    {{ page.header }}
+
+    {% include '@ncktrnr_tw/includes/logo-nav.html.twig' %}
+
+  </header>
+
+  {{ page.breadcrumb }}
+
+  {{ page.highlighted }}
+
+  {{ page.help }}
+
+  <main role="main">
+    <a id="main-content" tabindex="-1"></a>{# link is in html.html.twig #}
+
+    {# Hero garden: layers share a 1920×1080 viewBox, bottom-aligned and never
+       narrower than 56rem so the garden holds up on small screens; the hero's
+       height crops the empty sky above. Static until M4 adds parallax.
+       Below md the intro box joins the flow and the hero grows with it. #}
+    {# w-full + min-w-4xl rather than w-[max(100%,56rem)]: identical result,
+       but WebKit fails to recompute percentage-bearing max() widths on
+       window resize (layers stopped tracking the viewport in Safari) #}
+    {% set layer = 'absolute bottom-0 left-1/2 -translate-x-1/2 w-full min-w-4xl max-w-none pointer-events-none' %}
+    {# hero_v busts browser image caches – bump it whenever the layer SVGs
+       are re-exported (browsers cache images through normal reloads) #}
+    {% set hero_v = 2 %}
+    <section class="hero relative overflow-hidden h-[clamp(30rem,50vw,56rem)] max-md:h-auto max-md:pt-[calc(var(--header-h)+1rem)] max-md:pb-60" aria-labelledby="intro-heading">
+      <div class="hero-night absolute inset-0" aria-hidden="true"></div>
+      <img class="{{ layer }} layer-day parallax-back" src="/themes/custom/ncktrnr_tw/images/hero/back-light.svg?v={{ hero_v }}" alt="" width="1920" height="1080">
+      <img class="{{ layer }} layer-night parallax-back" src="/themes/custom/ncktrnr_tw/images/hero/back-dark.svg?v={{ hero_v }}" alt="" width="1920" height="1080">
+      <img class="{{ layer }} parallax-mid" src="/themes/custom/ncktrnr_tw/images/hero/middle.svg?v={{ hero_v }}" alt="" width="1920" height="1080">
+      <img class="{{ layer }}" src="/themes/custom/ncktrnr_tw/images/hero/top.svg?v={{ hero_v }}" alt="" width="1920" height="1080">
+
+      {# Intro box – rust border, centred + widened from Figma 151:10.
+         The sky-tinted translucent fill + blur keeps the text legible where
+         it overlaps the garden, in both themes (decision 2026-07-15).
+         relative below md keeps it painting above the layers. The h1 is for
+         document structure; the visible heading is the field's h2 #}
+      {% if node.hasField('field_intro') and not node.field_intro.isEmpty %}
+        <div class="absolute top-[22%] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-3xl rounded-4xl border border-rust bg-sky/70 backdrop-blur-xs p-6 md:p-8 max-md:relative max-md:top-auto max-md:left-auto max-md:translate-x-0 max-md:mx-auto text-lg [&_p]:mt-4">
+          {# Dragonfly perched on the box edge – inlined so the wing groups
+             can take the CSS flutter (see .dragonfly-hero in tailwind.css) #}
+          <div class="dragonfly-hero absolute -top-19 right-10 w-16 pointer-events-none" aria-hidden="true">
+            {% include '@ncktrnr_tw/images/dragonfly.svg' %}
+          </div>
+          <h1 id="intro-heading" class="visually-hidden">{{ node.label }}</h1>
+          {{ node.field_intro.processed }}
+        </div>
+      {% endif %}
+    </section>
+
+    {# What I do – columns from field_columns (one value per column:
+       h3 + one-liner + tag line). Editor markup can't carry classes, so the
+       cell styles its children with [&_…] descendant utilities; the section
+       heading is template copy (decision 2026-07-14). Renders only once the
+       field exists and has values. #}
+    {% if node.hasField('field_columns') and not node.field_columns.isEmpty %}
+      <section class="bg-card" aria-labelledby="columns-heading">
+        <div class="container mx-auto px-4 py-16 lg:py-24">
+          {# striptags: the field stores a paragraph; only its text belongs
+             inside the h2 #}
+          <h2 id="columns-heading" class="text-center max-w-3xl mx-auto">{{ node.field_content.0.value|striptags|trim }}</h2>
+          {# icons keyed by column position – a 4th column simply gets none;
+             heights differ on purpose (the seedhead blows up and away) #}
+          {% set icons = [
+            { file: 'define', size: 'h-20' },
+            { file: 'create', size: 'h-32' },
+            { file: 'communicate', size: 'h-64' },
+          ] %}
+          <div class="grid md:grid-cols-3 gap-10 mt-14">
+            {% for item in node.field_columns %}
+              <div class="text-lg [&_p]:mt-3 [&_p:last-child]:text-base [&_p:last-child]:text-ink-muted">
+                {% if icons[loop.index0] is defined %}
+                  <div class="flex items-end h-40 mb-6">
+                    <img src="/themes/custom/ncktrnr_tw/images/column-icons/{{ icons[loop.index0].file }}.svg" alt="" class="{{ icons[loop.index0].size }} w-auto">
+                  </div>
+                {% endif %}
+                {{ item.processed }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+    {% endif %}
+
+    {# Let's connect – copy from field_connect #}
+    {% if node.hasField('field_connect') and not node.field_connect.isEmpty %}
+      <section aria-labelledby="connect-heading">
+        <div class="container mx-auto px-4 py-16 lg:py-24 grid md:grid-cols-[14rem_1fr] gap-8 max-w-5xl">
+          <h2 id="connect-heading">Let’s connect</h2>
+          <div class="text-lg [&_p+p]:mt-4 [&_a]:underline [&_a:hover]:text-rust">
+            {{ node.field_connect.processed }}
+          </div>
+        </div>
+      </section>
+    {% endif %}
+
+  </main>
+
+  {% if page.footer %}
+    <footer role="contentinfo" class="relative border-t-2 border-neutral-600 min-h-24">
+    {# Footer dragonfly – line art recoloured to the theme tokens
+       (.footer-fly in tailwind.css) so it reads in both modes #}
+    <div class="footer-fly absolute -top-14 left-10 w-16" aria-hidden="true">
+      {% include '@ncktrnr_tw/images/footer-fly.svg' %}
+    </div>
+    <div class="absolute -top-17 right-10">
+      <lottie-player src="/themes/custom/ncktrnr_tw/lottie/dino.json" background="transparent" speed="1" style="width: 200px; height: 80px;" loop hover autoplay></lottie-player>
+      <noscript>{% include '@ncktrnr_tw/images/dino-vegan.svg' %}</noscript>
+    </div>
+      {{ page.footer }}
+    </footer>
+  {% endif %}
+
+</div>{# /.layout-container #}

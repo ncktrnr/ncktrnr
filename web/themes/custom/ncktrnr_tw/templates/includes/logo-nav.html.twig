@@ -1,25 +1,42 @@
+{{ attach_library('ncktrnr_tw/theme_toggle') }}
 
-
-<div class="container p-4">
-  <nav class="primary-nav" role="navigation" aria-label="Primary"> 
-    <a href="{{ path('<front>') }}" class="logo js-logo inline-flex items-center select-none whitespace-nowrap rounded py-2 focus-visible:outline focus-visible:outline-neutral-900 focus-visible:outline-offset-2" aria-label="Nick Turner"> 
-      <span class="reveal leading-none"> 
+{# container has no auto-centring in Tailwind v4 – mx-auto does it.
+   relative anchors the theme toggle, which sits outside the nav pill;
+   the extra right padding below md stops the pill running under it #}
+<div class="container mx-auto p-4 relative max-md:pr-14">
+  <nav class="primary-nav" role="navigation" aria-label="Primary">
+    <a href="{{ path('<front>') }}" class="logo js-logo inline-flex items-center select-none whitespace-nowrap rounded py-2 focus-visible:outline focus-visible:outline-ink focus-visible:outline-offset-2" aria-label="Nick Turner">
+      <span class="reveal leading-none">
         <span class="fallback">ncktrnr
-        </span> <!-- visible before JS --> 
+        </span> <!-- visible before JS -->
         <span class="track js-track" aria-hidden="true">
         </span>
-      </span> 
+      </span>
     </a>
-    <noscript><a href="{{ path('<front>') }}" class="font-bold text-neutral-900">Nick Turner</a>
+    <noscript><a href="{{ path('<front>') }}" class="font-bold text-ink">Nick Turner</a>
     </noscript>
 
-    <div class="flex items-center gap-7"> 
-      <a href="/work" class="relative group/link focus-visible:outline focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:ring-offset-2 text-xl duration-200 hover:text-gray-600 active:text-gray-800 rounded transition-colors py-2">work
-        <span class="absolute bottom-1 left-0 w-0 h-0.5 bg-neutral-500 transition-all duration-300 ease-out group-hover/link:w-full motion-reduce:transition-none"></span>
-      </a> 
-      <a href="/about" class="relative group/link focus-visible:outline focus-visible:outline-neutral-900 focus-visible:outline-offset-2 focus-visible:ring-offset-2 text-xl duration-200 hover:text-gray-600 active:text-gray-800 rounded transition-colors py-2">about
-        <span class="absolute bottom-1 left-0 w-0 h-0.5 bg-neutral-500 transition-all duration-300 ease-out group-hover/link:w-full motion-reduce:transition-none"></span>
-      </a> 
-    </div> 
+    <div class="flex items-center gap-7">
+      <a href="/work" class="relative group/link focus-visible:outline focus-visible:outline-ink focus-visible:outline-offset-2 focus-visible:ring-offset-2 text-xl duration-200 hover:text-ink-muted active:text-ink rounded transition-colors py-2">work
+        <span class="absolute bottom-1 left-0 w-0 h-0.5 bg-rust transition-all duration-300 ease-out group-hover/link:w-full motion-reduce:transition-none"></span>
+      </a>
+      <a href="/about" class="relative group/link focus-visible:outline focus-visible:outline-ink focus-visible:outline-offset-2 focus-visible:ring-offset-2 text-xl duration-200 hover:text-ink-muted active:text-ink rounded transition-colors py-2">about
+        <span class="absolute bottom-1 left-0 w-0 h-0.5 bg-rust transition-all duration-300 ease-out group-hover/link:w-full motion-reduce:transition-none"></span>
+      </a>
+    </div>
   </nav>
+
+  {# Theme toggle – outside the pill (Figma 151:10): mode switching isn't a
+     nav choice, and the motion toggle joins it here in M4. Sets data-theme
+     on <html> and stores the choice; no choice = follow the system
+     (js/theme-toggle.js). Both icons render – --night decides which shows #}
+  <button type="button" class="theme-toggle js-theme-toggle absolute right-6 top-1/2 -translate-y-1/2 size-6 cursor-pointer text-ink hover:text-ink-muted transition-colors rounded focus-visible:outline focus-visible:outline-ink focus-visible:outline-offset-2" aria-label="Switch theme">
+    <svg class="tt-moon absolute inset-0 size-6 transition-opacity motion-reduce:transition-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="tt-sun absolute inset-0 size-6 transition-opacity motion-reduce:transition-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5"/>
+      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+  </button>
 </div>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ncktrnr v2 – design tokens</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    // Same override model the site will use: data-theme on <html>, no value = follow system
+    const saved = localStorage.getItem('theme');
+    if (saved) document.documentElement.dataset.theme = saved;
+  </script>
+</head>
+<body class="bg-paper text-ink font-sans p-8 md:p-16">
+
+  <header class="mb-12 flex items-center justify-between">
+    <div>
+      <h1 class="text-4xl font-bold">ncktrnr v2 tokens</h1>
+      <p class="text-lg text-ink-muted mt-2">M0 – eyeball against Figma <code>Home latest</code> (151:10) and <code>work page latest</code> (152:6102)</p>
+    </div>
+    <button id="theme-toggle" class="rounded-full bg-rust-tint text-ink px-6 py-3 text-base border border-rust">
+      theme: <span id="theme-label">system</span>
+    </button>
+  </header>
+
+  <!-- Colours -->
+  <section class="mb-16">
+    <h2 class="text-2xl font-bold mb-6">Colours</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="swatches">
+      <!-- filled by script -->
+    </div>
+  </section>
+
+  <!-- Surfaces in context -->
+  <section class="mb-16">
+    <h2 class="text-2xl font-bold mb-6">Surfaces</h2>
+    <div class="bg-sky rounded-4xl p-8 mb-4">
+      <p class="text-base text-ink-muted mb-4">sky – hero</p>
+      <div class="border border-rust rounded-4xl bg-transparent p-6 max-w-xl">
+        <p class="text-xl font-bold"><span class="text-rust">Hi, I’m Nick</span> 👋</p>
+        <p class="text-xl mt-4">Intro box – rust border on sky, rounded-4xl (32px, nearest stock to Figma 36).</p>
+      </div>
+    </div>
+    <div class="bg-surface rounded-4xl p-8">
+      <p class="text-base text-ink-muted mb-4">surface – inner pages</p>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-card rounded-4xl p-6">
+          <div class="bg-sky rounded-3xl h-32 mb-4"></div>
+          <p class="text-2xl font-bold">Work card</p>
+          <p class="text-lg text-ink-muted mt-2">card on surface, rounded-4xl; tile rounded-3xl (24px, nearest stock to Figma 27) on the screenshot</p>
+        </div>
+        <div class="bg-card rounded-4xl p-6">
+          <p class="text-2xl font-bold text-rust">Define</p>
+          <p class="text-xl mt-3">Get clear on goals, audiences, and content</p>
+          <p class="text-lg text-ink-muted mt-3">Research · discovery workshops · information architecture · content models</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nav pill -->
+  <section class="mb-16">
+    <h2 class="text-2xl font-bold mb-6">Nav pill</h2>
+    <div class="inline-flex items-center gap-8 rounded-full bg-rust-tint px-8 py-4">
+      <span class="text-xl font-semibold">ncktrnr</span>
+      <a href="#" class="text-xl">work</a>
+      <a href="#" class="text-xl">about</a>
+    </div>
+    <p class="text-base text-ink-muted mt-3">rust-tint (rust at 10% / 16% dark)</p>
+  </section>
+
+  <!-- Type scale -->
+  <section class="mb-16">
+    <h2 class="text-2xl font-bold mb-6">Type scale (stock Tailwind sizes; Geist Mono for review and possible change)</h2>
+    <div class="space-y-6">
+      <p class="text-4xl font-bold">text-4xl · 36 – Selected work</p>
+      <p class="text-2xl font-bold">text-2xl · 24 – Let’s connect</p>
+      <p class="text-xl">text-xl · 20 – I help people tell their stories online, from ideas to impact.</p>
+      <p class="text-lg text-ink-muted">text-lg · 18 – Research · discovery workshops · information architecture</p>
+      <p class="text-base">text-base · 16 – Made with plants, 100% vegan</p>
+    </div>
+  </section>
+
+  <!-- Accents -->
+  <section class="mb-16">
+    <h2 class="text-2xl font-bold mb-6">Accents</h2>
+    <p class="text-xl">Links and highlights in <a href="#" class="text-rust underline">rust</a>,
+      growth in <span class="text-leaf font-semibold">leaf</span>,
+      <span class="text-leaf-bright font-semibold">leaf-bright</span> and
+      <span class="text-leaf-deep font-semibold">leaf-deep</span></p>
+  </section>
+
+  <footer class="text-base text-ink-muted border-t border-ink-muted/30 pt-6">
+    Static page, not routed by Drupal – /themes/custom/ncktrnr_tw/styleguide.html
+  </footer>
+
+  <script>
+    const tones = ['paper','surface','card','sky','ink','ink-muted','rust','rust-tint','leaf','leaf-bright','leaf-deep'];
+    const grid = document.getElementById('swatches');
+    for (const t of tones) {
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <div class="h-20 rounded-3xl border border-ink-muted/30" style="background: var(--tone-${t})"></div>
+        <p class="text-base mt-2">${t}</p>
+        <p class="text-base text-ink-muted" data-tone="${t}"></p>`;
+      grid.appendChild(el);
+    }
+    function refreshValues() {
+      const cs = getComputedStyle(document.documentElement);
+      document.querySelectorAll('[data-tone]').forEach(p => {
+        p.textContent = cs.getPropertyValue(`--tone-${p.dataset.tone}`).trim();
+      });
+    }
+    const order = ['system', 'light', 'dark'];
+    const label = document.getElementById('theme-label');
+    function applyLabel() {
+      label.textContent = document.documentElement.dataset.theme || 'system';
+    }
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const current = document.documentElement.dataset.theme || 'system';
+      const next = order[(order.indexOf(current) + 1) % order.length];
+      if (next === 'system') {
+        delete document.documentElement.dataset.theme;
+        localStorage.removeItem('theme');
+      } else {
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('theme', next);
+      }
+      applyLabel(); refreshValues();
+    });
+    applyLabel(); refreshValues();
+  </script>
+</body>
+</html>

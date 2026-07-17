@@ -1,0 +1,21 @@
+uuid: d361851a-1abb-47bc-9bfc-e7a9938eb0e0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_in_gallery
+    - media.type.svg_image
+id: media.svg_image.field_in_gallery
+field_name: field_in_gallery
+entity_type: media
+bundle: svg_image
+label: 'Show in gallery'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'In gallery'
+  off_label: 'Not in gallery'
+field_type: boolean

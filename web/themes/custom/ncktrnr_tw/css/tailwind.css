@@ -2,26 +2,130 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Dark mode: manual override via data-theme on <html>; with no override,
+   prefers-color-scheme decides (see the two value blocks below). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------------------
+   v2 design tokens – from Figma `ncktrnr.com` (8hxwpK5nd45OX5jC0OsGyN),
+   frames `Home latest` 151:10 and `work page latest` 152:6102.
+   Light values are Figma's; dark values are derived (no dark frames) –
+   eyeball on /themes/custom/ncktrnr_tw/styleguide.html and adjust there.
+--------------------------------------------------------------------------- */
+
+:root {
+    /* surfaces */
+    --tone-paper: #fffaef;   /* cream – home + footer background */
+    --tone-surface: #f4f2ec; /* warm grey – inner-page background */
+    --tone-card: #ffffff;    /* work cards */
+    --tone-sky: #eef9ff;     /* hero sky – fades to night in dark mode */
+
+    /* text */
+    --tone-ink: #121212;
+    --tone-ink-muted: #636363;
+
+    /* accents */
+    --tone-rust: #da3d12;
+    --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 10%, transparent);
+    --tone-leaf: #57a636;
+    --tone-leaf-bright: #a4d43d;
+    --tone-leaf-deep: #476841;
+
+    /* 0 = day, 1 = night. Drives the hero's light/dark layer swap without
+       repeating the three selector blocks; M4 transitions it for the
+       day-fades-to-night crossfade. */
+    --night: 0;
+}
+
+[data-theme="dark"] {
+    --tone-paper: #181511;
+    --tone-surface: #211d18;
+    --tone-card: #2a251f;
+    --tone-sky: #0c1626;
+
+    --tone-ink: #f2ede1;
+    --tone-ink-muted: #a39d92;
+
+    --tone-rust: #ff6a3c;
+    --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
+    --tone-leaf: #6dbb4a;
+    --tone-leaf-bright: #b6de5a;
+    --tone-leaf-deep: #86a878;
+
+    --night: 1;
+}
+
+/* No manual choice stored → follow the system preference */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+        --tone-paper: #181511;
+        --tone-surface: #211d18;
+        --tone-card: #2a251f;
+        --tone-sky: #0c1626;
+
+        --tone-ink: #f2ede1;
+        --tone-ink-muted: #a39d92;
+
+        --tone-rust: #ff6a3c;
+        --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
+        --tone-leaf: #6dbb4a;
+        --tone-leaf-bright: #b6de5a;
+        --tone-leaf-deep: #86a878;
+
+        --night: 1;
+    }
+}
+
 @theme {
     --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --font-sans: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --font-serif: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --font-body: var(--font-sans); 
+    --font-body: var(--font-sans);
     --font-display: var(--font-sans);
+
+    /* Type sizes use the stock Tailwind scale – the Figma sizes map exactly:
+       36px text-4xl · 24px text-2xl · 20px text-xl · 18px text-lg · 16px text-base */
+
+    /* Radii use the nearest stock utilities (2026-07-14: Figma is a
+       starting point, round to stock Tailwind) – cards/intro rounded-4xl,
+       screenshot/gallery tiles rounded-3xl */
+}
+
+/* Semantic colours – exposed as bg-paper, text-ink, border-rust etc.
+   `inline` so utilities track the light/dark custom properties above. */
+@theme inline {
+    --color-paper: var(--tone-paper);
+    --color-surface: var(--tone-surface);
+    --color-card: var(--tone-card);
+    --color-sky: var(--tone-sky);
+    --color-ink: var(--tone-ink);
+    --color-ink-muted: var(--tone-ink-muted);
+    --color-rust: var(--tone-rust);
+    --color-rust-tint: var(--tone-rust-tint);
+    --color-leaf: var(--tone-leaf);
+    --color-leaf-bright: var(--tone-leaf-bright);
+    --color-leaf-deep: var(--tone-leaf-deep);
 }
 
 @layer base {
     html {
-        font-family: var(--font-sans); 
+        font-family: var(--font-sans);
   }
 
     body {
-        font-family: var(--font-body); 
+        font-family: var(--font-body);
+        background-color: var(--tone-paper);
+        color: var(--tone-ink);
   }
 
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--font-display);
   }
+
+    /* Standard heading hierarchy (agreed 2026-07-14) – templates and editor
+       content share consistent sizes, no per-instance overrides */
+    h2 { @apply text-2xl font-bold; }
+    h3 { @apply text-xl font-bold; }
 
   p, span, a, li, ol, strong, em, b, i {
     font-family: var(--font-body);
@@ -30,8 +134,10 @@
 
 @layer components {
     :root {
-    --logo-abbr-fallback: 7ch; 
+    --logo-abbr-fallback: 7ch;
     --logo-full-fallback: 12.6ch;
+    /* rendered header height: container p-4 + pill py-4 + 20px logo line */
+    --header-h: 6.75rem;
     }
 
     .typography {
@@ -51,16 +157,83 @@
     font-family: var(--font-display);
   }
 
-    /* Navigation container */
-  .primary-nav { 
-    @apply flex items-center mx-auto max-w-2xl justify-between rounded-full border-2 border-neutral-500 bg-white px-8 py-4; 
-     
+    /* Navigation pill – rust tint over whatever scrolls beneath (Figma 151:5678).
+       Blur is on trial per decision 6: drop it if it fights the hero. */
+  .primary-nav {
+    @apply flex items-center mx-auto max-w-2xl justify-between rounded-full bg-rust-tint px-6 py-4 backdrop-blur-md md:px-8;
     }
-  .primary-nav a { 
-    @apply text-neutral-900 rounded-md inline-flex items-center; 
+  .primary-nav a {
+    @apply text-ink rounded-md inline-flex items-center;
     }
-  .primary-nav a:focus-visible { 
-    outline: 1px solid #111827; outline-offset: 2px; 
+  .primary-nav a:focus-visible {
+    outline: 1px solid var(--tone-ink); outline-offset: 2px;
+    }
+
+    /* -----------------------------------------------------------------------
+       Front-page hero (page--front.html.twig). Positioning and sizing live
+       as utilities in the template; only what utilities can't express
+       cleanly is defined here:
+       – sky gradients, rebuilt from the Illustrator exports
+         (hero-parallax/SVG/bg-light + bg-dark). They are sized to the
+         layers' virtual 1920×1080 canvas (56.25% of width) and
+         bottom-anchored, so the hero crops sky and garden together; the
+         day gradient's far stop sits above the crop, hence 133%
+       – the --night swap: the `dark:` variant only matches the manual
+         data-theme override, not system dark, so day/night opacity keys
+         off the --night token (which also gives M4 its crossfade)
+    ----------------------------------------------------------------------- */
+    .hero {
+        /* pull up behind the sticky nav so the sky runs to the page top */
+        margin-top: calc(-1 * var(--header-h));
+        background-image: linear-gradient(to top, #eef9ff 0%, #78ddfa 133%);
+        background-size: 100% max(56.25vw, 31.5rem);
+        background-position: bottom;
+        background-repeat: no-repeat;
+    }
+    .hero-night {
+        background-image: linear-gradient(to bottom, #030b2f 0%, #0a1f43 29%, #0f2144 41%, #1f2748 57%, #3a3250 74%, #5f415a 93%, #6e485e 100%);
+        background-size: 100% max(56.25vw, 31.5rem);
+        background-position: bottom;
+        background-repeat: no-repeat;
+        opacity: var(--night);
+    }
+    .layer-day { opacity: calc(1 - var(--night)); }
+    .layer-night { opacity: var(--night); }
+
+    /* Below md the hero grows with the in-flow intro box (see template)
+       and is taller than the layer canvas, so the sky stretches to fill */
+    @media (width < 48rem) {
+        .hero,
+        .hero-night { background-size: 100% 100%; }
+    }
+
+    /* Theme toggle – the same --night token swaps the icons */
+    .theme-toggle .tt-sun { opacity: var(--night); }
+    .theme-toggle .tt-moon { opacity: calc(1 - var(--night)); }
+
+    /* M4 taster (2026-07-14): far layers lag behind the scroll, so the
+       garden pulls apart in depth as the hero leaves the viewport – back
+       lags most, top travels with the page. The keyframe animates
+       `transform`, which composes with the utility centring (v4's
+       -translate-x-1/2 uses the separate `translate` property).
+       Scroll-driven animation: Chrome/Edge/Safari 26+; other browsers stay
+       static – the intended fallback. Full treatment incl. the manual
+       motion toggle lands in M4. */
+    @supports (animation-timeline: scroll()) {
+        @media (prefers-reduced-motion: no-preference) {
+            .parallax-back,
+            .parallax-mid {
+                animation: hero-lag linear both;
+                /* scroll(root), not scroll(): the hero's overflow-hidden
+                   makes it the 'nearest scroller', which never scrolls */
+                animation-timeline: scroll(root);
+            }
+            .parallax-back { --lag: 110px; }
+            .parallax-mid { --lag: 55px; }
+        }
+    }
+    @keyframes hero-lag {
+        to { transform: translateY(var(--lag)); }
     }
 
     /* Anchor stays full width for reliable clicks */
@@ -82,8 +255,15 @@
     .logo:hover .reveal,
     .logo:focus-visible .reveal { width: var(--full-w, var(--logo-full-fallback)); }
 
-    /* Track spans full width to avoid cropping */
-    .logo .track { position: relative; display: block; line-height: 1; height: 1em; width: var(--full-w, var(--logo-full-fallback)); }
+    /* The reveal's fixed height stops the pill moving while fonts swap –
+       fallback-font line metrics differ from Geist Mono's by a few px */
+    .logo .reveal { height: 1em; }
+
+    /* Track spans full width to avoid cropping. Hidden until the JS has
+       built it: pre-build the empty track is a second 1em block under the
+       fallback text, briefly doubling the logo's height on every load */
+    .logo .track { position: relative; display: none; line-height: 1; height: 1em; width: var(--full-w, var(--logo-full-fallback)); }
+    .logo.is-built .track { display: block; }
 
     /* Kept letters: slight stagger so width starts first, then slide */
     .logo .char { position: absolute; top: 0; left: 0; transform: translateX(var(--dx, 0)); }
@@ -99,17 +279,54 @@
     .logo .fallback { display: inline; }
     .logo.is-built .fallback { display: none; } /* hide once JS has built the animated letters */
 
-    /* Touch (no hover): always show full */
-    @media (hover: none) {
+    /* Touch (no hover): show the full name where the pill has room for it.
+       Below md the abbreviated mark stays – 'nick turner' plus the nav links
+       overflows the pill at phone widths */
+    @media (hover: none) and (width >= 48rem) {
         .logo .reveal { width: var(--full-w, var(--logo-full-fallback)); }
         .logo .char.keep { transform: translateX(0); }
         .logo .char.missing { opacity: 1; }
     }
 
-    /* Reduced motion */
+    /* Reduced motion: no reveal animation. The static full-name layout needs
+       mask width and letter positions to agree, so it is gated to widths
+       that fit it – below that the abbreviated resting state applies */
     @media (prefers-reduced-motion: reduce) {
-        .logo .reveal { transition: none; width: var(--full-w, var(--logo-full-fallback)); }
-        .logo .char { transition: none !important; transform: translateX(0) !important; opacity: 1 !important; }
+        .logo .reveal { transition: none; }
+        .logo .char { transition: none !important; }
+        @media (width >= 48rem) {
+            .logo .reveal { width: var(--full-w, var(--logo-full-fallback)); }
+            .logo .char { transform: translateX(0) !important; opacity: 1 !important; }
+        }
+    }
+
+    /* -----------------------------------------------------------------------
+       Dragonflies (2026-07-15). Hero fly perches on the intro box: wings
+       shimmer in short bursts (scaleX around each wing's own centre reads
+       as flutter at this amplitude) and the whole fly bobs gently – both
+       are keyframes, which utilities can't express. Footer fly is static
+       line art; its baked black/white is remapped to the theme tokens so
+       it reads in both modes.
+    ----------------------------------------------------------------------- */
+    .dragonfly-hero { animation: dfly-bob 4s ease-in-out infinite alternate; }
+    .dragonfly-hero [id^="dfly-wing"] {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: dfly-flutter 5s ease-in-out infinite;
+    }
+    @keyframes dfly-bob {
+        to { transform: translateY(3px); }
+    }
+    /* a burst of five flaps (~1.2s), then stillness for the rest of the
+       cycle – amplitude and burst length picked to read at 64px render */
+    @keyframes dfly-flutter {
+        0%, 5%, 10%, 15%, 20% { transform: scaleX(1); }
+        2.5%, 7.5%, 12.5%, 17.5%, 22.5% { transform: scaleX(0.7); }
+        25%, 100% { transform: scaleX(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .dragonfly-hero,
+        .dragonfly-hero [id^="dfly-wing"] { animation: none; }
     }
 
       /* High-contrast and forced-colors adjustments */
@@ -124,6 +341,13 @@
     }
 
 }
+
+/* Footer dragonfly recolour – deliberately outside @layer: the inlined
+   SVG's own <style> is un-layered, and un-layered CSS beats any layer, so
+   these must be un-layered too (they then win on specificity) */
+.footer-fly .ffly-1 { fill: var(--tone-paper); stroke: var(--tone-ink); }
+.footer-fly .ffly-2 { stroke: var(--tone-ink); }
+.footer-fly circle:not(.ffly-1) { fill: var(--tone-ink); }
 
 @layer utilities {
 
