@@ -92,12 +92,11 @@ log "Syncing vendor/ -> $REMOTE_VENDOR/"
 run_rsync -rlptzv $DRY_RUN --delete \
   vendor/ "$REMOTE:$REMOTE_VENDOR/"
 
-# --chmod forces web-servable permissions regardless of local modes: ddev's
-# mutagen writes files as 600, and shipping that once made every asset the
-# 11.4.2 update touched a 404 (files existed but the static server could not
-# read them – jQuery included, which broke the admin UI).
+# Web-servable permissions are enforced server-side after the sync (see
+# post-deploy below): macOS's bundled rsync is now openrsync, which rejects
+# --chmod's octal syntax and silently ignores the symbolic form it accepts.
 log "Syncing web/ -> $REMOTE_DOCROOT/"
-run_rsync -rlptzv $DRY_RUN --delete --chmod=D755,Fu+rw,Fgo+r \
+run_rsync -rlptzv $DRY_RUN --delete \
   --exclude='/autoload_runtime.php' \
   --exclude='/sites/default/settings.php' \
   --exclude='/sites/default/settings.*.php' \
@@ -122,6 +121,15 @@ if [[ -n "$DRY_RUN" ]]; then
 fi
 
 # ------------------------------------------------------------ post-deploy ----
+# ddev's mutagen writes files as 600, and shipping that once made every asset
+# the 11.4.2 update touched a 404 (files existed but the static server could
+# not read them – jQuery included, which broke the admin UI). Modes are fixed
+# at the destination – immune to which rsync the local machine ships – using
+# the same remedy docs/deployment.md documents; settings*.php stay 600.
+log "Forcing web-servable file modes on the server"
+ssh "$REMOTE" "find $REMOTE_DOCROOT -type d ! -perm -o+x -exec chmod 755 {} + ; \
+  find $REMOTE_DOCROOT -type f ! -perm -o+r ! -name 'settings*.php' -exec chmod 644 {} +"
+
 log "Running database updates, config import and cache rebuild on the server"
 ssh "$REMOTE" "$REMOTE_DRUSH deploy -y"
 
