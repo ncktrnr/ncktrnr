@@ -23,9 +23,16 @@
     /* text */
     --tone-ink: #121212;
     --tone-ink-muted: #636363;
+    /* hairlines – rules, table and blockquote borders */
+    --tone-line: color-mix(in srgb, var(--tone-ink) 15%, transparent);
 
-    /* accents */
-    --tone-rust: #da3d12;
+    /* accents.
+       Rust is a shade darker than the Figma swatch (#da3d12), which measured
+       4.33:1 on paper and 4.51:1 on a white card – either side of the 4.5:1
+       floor, and rust carries link text on both. This clears it everywhere
+       with margin (4.97:1 / 5.18:1) at the same hue. Dark mode's rust was
+       already fine and is unchanged. */
+    --tone-rust: #c93811;
     --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 10%, transparent);
     --tone-leaf: #57a636;
     --tone-leaf-bright: #a4d43d;
@@ -45,6 +52,7 @@
 
     --tone-ink: #f2ede1;
     --tone-ink-muted: #a39d92;
+    --tone-line: color-mix(in srgb, var(--tone-ink) 20%, transparent);
 
     --tone-rust: #ff6a3c;
     --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
@@ -65,6 +73,7 @@
 
         --tone-ink: #f2ede1;
         --tone-ink-muted: #a39d92;
+        --tone-line: color-mix(in srgb, var(--tone-ink) 20%, transparent);
 
         --tone-rust: #ff6a3c;
         --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
@@ -139,23 +148,6 @@
     /* rendered header height: container p-4 + pill py-4 + 20px logo line */
     --header-h: 6.75rem;
     }
-
-    .typography {
-      color: var(--color-gray-950);
-    }
-
-    .prose {
-        font-family: var(--font-body);
-    }
-
-  .prose h1,
-  .prose h2,
-  .prose h3,
-  .prose h4,
-  .prose h5,
-  .prose h6 {
-    font-family: var(--font-display);
-  }
 
     /* Navigation pill – rust tint over whatever scrolls beneath (Figma 151:5678).
        Blur is on trial per decision 6: drop it if it fights the hero. */
@@ -351,21 +343,52 @@
 
 @layer utilities {
 
+  /* -------------------------------------------------------------------------
+     Long-form text. `prose` comes from @tailwindcss/typography and is applied
+     by ncktrnr_tw_preprocess_field() – see the .theme file for which fields
+     take it.
+
+     The plugin colours everything through its own `--tw-prose-*` variables,
+     set on `.prose` itself, so they override the `--tone-ink` that the rest
+     of the page inherits from `body` and do not follow the theme. Mapping
+     them to the design tokens here fixes that in one place and keeps any
+     future rich text (blockquotes, tables, rules) in the palette.
+
+     Not `dark:prose-invert`: the `dark` variant matches only the manual
+     [data-theme] override, so it would miss anyone on system dark who has
+     never touched the toggle – which is the common case.
+
+     `pre`/`kbd` variables are left at the plugin's defaults: they are
+     self-consistent in both modes and the site has no code blocks.
+  ------------------------------------------------------------------------- */
   .prose {
     font-family: var(--font-body);
     max-width: 76ch;
+
+    --tw-prose-body: var(--tone-ink);
+    --tw-prose-headings: var(--tone-ink);
+    --tw-prose-bold: var(--tone-ink);
+    --tw-prose-quotes: var(--tone-ink);
+    --tw-prose-code: var(--tone-ink);
+
+    --tw-prose-lead: var(--tone-ink-muted);
+    --tw-prose-counters: var(--tone-ink-muted);
+    --tw-prose-bullets: var(--tone-ink-muted);
+    --tw-prose-captions: var(--tone-ink-muted);
+
+    --tw-prose-links: var(--tone-rust);
+
+    --tw-prose-hr: var(--tone-line);
+    --tw-prose-quote-borders: var(--tone-line);
+    --tw-prose-th-borders: var(--tone-line);
+    --tw-prose-td-borders: var(--tone-line);
+  }
+
+  .prose :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-display);
   }
 
   h1.page-title {
-    @apply text-2xl lg:text-3xl xl:text-4xl; 
+    @apply text-2xl lg:text-3xl xl:text-4xl;
   }
-  /* .prose a {
-    color: var(--color-violet-500);
-    &:hover {
-        color: var(--color-violet-400);
-    }
-    &:visited {
-        color: var(--color-violet-600);
-    }
-  } */
 }
