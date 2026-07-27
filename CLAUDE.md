@@ -65,3 +65,34 @@ commit the diff in `config/sync/` with the related code.
 - Scroll-driven CSS animations (hero parallax) do not run in Claude's
   embedded preview pane – verify in a real browser. Inside the
   overflow-hidden hero, use `scroll(root)`, never bare `scroll()`.
+- **Spacing direction: use `margin-bottom` and `gap`, never `margin-top`.**
+  Where a child needs pushing to the bottom of a flex column, use `grow` on
+  the element above it rather than `mt-auto` on the element itself.
+- The reading measure belongs to the **text**, not the page. Basic pages
+  compose their layout in Layout Builder, so the node template cannot cap the
+  width – `ncktrnr_tw_preprocess_field()` puts `prose` on the fields that
+  carry long-form text (`field_content`, block `body`). Page titles never take
+  the measure: every `h1` starts at the container's left edge, so it does not
+  shift sideways between a prose page and the work page's card grid.
+- Layout Builder renders its field blocks with `#view_mode` of **`_custom`**,
+  not `full`. Anything keyed off the view mode has to allow both, or every
+  Basic page silently drops out.
+- `prose` zeroes the bottom margin of its last child, so spacing below a
+  heading that is alone inside a prose wrapper has to sit on the wrapper.
+- The `3_2_*` media displays crop **server-side** via `focal_point_scale_and_crop`,
+  which centres when no focal point is stored. `object-position` in a template
+  is a no-op against them – set a focal point on the media instead.
+- Shared responsive image styles (`3_2_wide` and friends) declare
+  `sizes: 100vw`, which makes every browser fetch the 1800w rung. Work cards
+  use `3_2_card` instead – same rungs, honest `sizes`. Give any new fixed-width
+  component its own style rather than editing the shared ones.
+- Card geometry on `/work` must not vary with image count: frame width and
+  strip padding are unconditional, because width drives height on a 3:2 box and
+  one taller card knocks its neighbour's title out of line.
+- Drupal's `visually-hidden` field labels are absolutely positioned and will
+  escape an `overflow-x-auto` scroller unless that scroller is `relative`,
+  stretching the document sideways in Chrome (not Safari).
+- Preview on `ncktrnr.ddev.site`: the Browser pane allows `javascript_tool`
+  and `resize_window` but blocks screenshots. Measure the DOM in the pane;
+  screenshot via headless Chrome – which does **not** apply a mobile viewport,
+  so narrow captures look broken when they are fine.

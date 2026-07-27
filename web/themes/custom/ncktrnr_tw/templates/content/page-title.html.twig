@@ -14,8 +14,10 @@
 #}
 {{ title_prefix }}
 {% if title %}
-  <div class="prose lg:prose-lg mx-auto">
-    <h1{{ title_attributes.addClass('page-title text-sm') }}>{{ title }}</h1>
-  </div>
+  {# Every page title starts at the container's left edge, whatever sits
+     beneath it. The reading measure belongs to the text, not the page, so a
+     title that took it too would shift sideways between a prose page and the
+     work page's card grid. Size comes from `h1.page-title` in tailwind.css. #}
+  <h1{{ title_attributes.addClass('page-title mb-8') }}>{{ title }}</h1>
 {% endif %}
 {{ title_suffix }}

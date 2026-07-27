@@ -1,0 +1,28 @@
+{#
+/**
+ * @file
+ * Basic pages rendered full.
+ *
+ * The base node template wraps content in `prose lg:prose-lg`, which caps the
+ * measure. That is right for an article and wrong for a page whose layout is
+ * composed in Layout Builder – the work page's card grid needs the full
+ * container width.
+ *
+ * Layout Builder owns the layout on these pages, so this template stays out of
+ * its way, and the measure is applied per field instead: see
+ * ncktrnr_tw_preprocess_field(), which caps field_content and block bodies in
+ * the full view mode. Nothing here caps anything.
+ *
+ * Available variables: see node.html.twig.
+ */
+#}
+<article{{ attributes }}>
+
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  <div{{ content_attributes.addClass('node__content', 'mb-12') }}>
+    {{ content }}
+  </div>
+
+</article>

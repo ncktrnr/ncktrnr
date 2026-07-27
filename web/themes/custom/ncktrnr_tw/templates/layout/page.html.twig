@@ -65,7 +65,10 @@
   <main role="main">
     <a id="main-content" tabindex="-1"></a>{# link is in html.html.twig #}
 
-    <div class="container px-4 layout-content lg:px-0">
+    {# `container` sets a max-width but does not centre – without mx-auto the
+       slack all falls on the right. Padding is kept at every width so content
+       never touches the viewport edge. #}
+    <div class="container mx-auto px-4 layout-content">
       {{ page.content }}
     </div>{# /.layout-content #}
 
