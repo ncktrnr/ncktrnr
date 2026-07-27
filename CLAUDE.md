@@ -96,3 +96,15 @@ commit the diff in `config/sync/` with the related code.
   and `resize_window` but blocks screenshots. Measure the DOM in the pane;
   screenshot via headless Chrome – which does **not** apply a mobile viewport,
   so narrow captures look broken when they are fine.
+- For a dark-mode capture pass headless Chrome `--force-dark-mode` **alone**.
+  Adding `--enable-features=WebContentsForceDark` turns on Chrome's auto-dark,
+  which inverts the page and yields a confidently wrong screenshot.
+- The committed `css/styles.css` is the unminified `npm run dev` output, but
+  `deploy.sh` runs `build:prod`, which minifies it in place. **Every deploy
+  leaves the working tree dirty** – run `npm run dev` afterwards to restore it.
+- `@tailwindcss/typography` colours prose through its own `--tw-prose-*`
+  variables, set on `.prose` itself, so they beat anything inherited from
+  `body`. They are mapped to the design tokens in `css/tailwind.css`. Don't
+  reach for `dark:prose-invert`: the `dark` variant here matches only the
+  manual `[data-theme]` override, so it misses system dark with no stored
+  choice.
