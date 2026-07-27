@@ -1,0 +1,38 @@
+uuid: 57ce8092-aaf3-4dee-9a1f-61ec333fb2a6
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.3_2_card
+    - field.field.media.image.field_caption
+    - field.field.media.image.field_gallery_link
+    - field.field.media.image.field_in_gallery
+    - field.field.media.image.field_media_image
+    - media.type.image
+    - responsive_image.styles.3_2_card
+  module:
+    - responsive_image
+id: media.image.3_2_card
+targetEntityType: media
+bundle: image
+mode: 3_2_card
+content:
+  field_media_image:
+    type: responsive_image
+    label: hidden
+    settings:
+      responsive_image_style: 3_2_card
+      image_link: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  created: true
+  field_caption: true
+  field_gallery_link: true
+  field_in_gallery: true
+  name: true
+  thumbnail: true
+  uid: true
