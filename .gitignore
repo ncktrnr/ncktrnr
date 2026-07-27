@@ -62,3 +62,8 @@ sites/simpletest
 # Environment settings that must never be committed
 /web/sites/*/settings.ddev.php
 /web/sites/*/settings.prod.php
+/.staged-screenshots/
+
+# Generated PHP cache directories (Drupal recreates them, and drush cr
+# deletes their .htaccess on every rebuild)
+/web/sites/default/files/php/
