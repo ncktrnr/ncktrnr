@@ -1,0 +1,47 @@
+{#
+/**
+ * @file
+ * Case study rendered on its own page.
+ *
+ * The card on /work is the case study – this page exists for stray /node/N
+ * visits and for checking a node while editing it. It is deliberately plain,
+ * so it never reads as somewhere we meant to send anyone.
+ *
+ * The title comes from the page title block, not from here.
+ *
+ * Available variables: see node.html.twig.
+ */
+#}
+<article{{ attributes.addClass('mb-12 flex flex-col gap-6') }}>
+
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  {% if content.field_role|render|trim is not empty %}
+    <p class="text-base text-ink-muted">{{ content.field_role }}</p>
+  {% endif %}
+
+  {{ content.field_value }}
+  {{ content.field_description }}
+
+  {# No prose wrapper here – ncktrnr_tw_preprocess_field() puts the measure on
+     field_content itself in the full view mode. #}
+  {{ content.field_content }}
+
+  {# Full width and stacked – no crop, no strip. On this page the screenshots
+     are reference, not a composition. #}
+  {% if content.field_screenshots['#items'] is not empty %}
+    <div class="flex flex-col gap-6 [&_img]:w-full">
+      {{ content.field_screenshots }}
+    </div>
+  {% endif %}
+
+  {% if content.field_link|render|trim is not empty %}
+    <div class="text-base [&_a]:text-rust [&_a]:underline [&_a]:underline-offset-4">
+      {{ content.field_link }}
+    </div>
+  {% endif %}
+
+  {{ content.field_tags }}
+
+</article>

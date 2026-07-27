@@ -1,8 +1,9 @@
-uuid: 3cb14e67-d0cd-4b7d-827d-db0f9fb2a414
+uuid: 25d89261-9624-4870-bb5c-959b645a4905
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.card
     - field.field.node.case_study.field_content
     - field.field.node.case_study.field_description
     - field.field.node.case_study.field_link
@@ -14,26 +15,18 @@ dependencies:
     - node.type.case_study
   module:
     - link
-    - text
     - user
-id: node.case_study.default
+id: node.case_study.card
 targetEntityType: node
 bundle: case_study
-mode: default
+mode: card
 content:
-  field_content:
-    type: text_default
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    weight: 3
-    region: content
   field_description:
     type: basic_string
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 1
+    weight: 2
     region: content
   field_link:
     type: link
@@ -45,41 +38,35 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 6
+    weight: 4
     region: content
   field_role:
     type: string
-    label: inline
+    label: hidden
     settings:
       link_to_entity: false
       link_rel: canonical
     third_party_settings: {  }
-    weight: 0
+    weight: 1
     region: content
   field_screenshots:
     type: entity_reference_entity_view
     label: hidden
     settings:
-      view_mode: default
+      view_mode: 3_2_card
       link: false
     third_party_settings: {  }
-    weight: 4
-    region: content
-  field_tags:
-    type: entity_reference_label
-    label: inline
-    settings:
-      link: false
-    third_party_settings: {  }
-    weight: 5
+    weight: 0
     region: content
   field_value:
     type: basic_string
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 3
     region: content
 hidden:
+  field_content: true
+  field_tags: true
   field_weight: true
   links: true

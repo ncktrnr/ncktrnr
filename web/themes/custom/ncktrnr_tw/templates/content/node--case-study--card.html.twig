@@ -1,0 +1,103 @@
+{#
+/**
+ * @file
+ * Case study rendered as a card on the work page.
+ *
+ * The card is the whole case study – there is no node page to click through
+ * to, so nothing inside it links except the link out to the live site.
+ *
+ * Three parts:
+ * - a scroll-snap strip of screenshots (no JS; one image collapses to a
+ *   plain figure)
+ * - the face: title, role, description
+ * - the lower third: the value statement and the link out, separated by a
+ *   rule. Always visible – it does not depend on hover.
+ *
+ * Available variables: see node.html.twig.
+ */
+#}
+<article{{ attributes.addClass('bg-card rounded-4xl overflow-hidden flex flex-col w-full') }}>
+
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  {# Loop the items rather than printing the field: Drupal wraps the whole
+     field in one element, so styling `> *` would hit that wrapper and stack
+     the images instead of laying them out in a row.
+
+     The ratio sits on the wrapper, not the image – Tailwind's preflight sets
+     `img { height: auto }`, which overrides `aspect-*` on the image itself.
+
+     Which part of each screenshot survives the crop is decided by its focal
+     point, not here: `3_2_wide` crops server-side, so the image arrives
+     already at 3:2 and `object-position` would have nothing left to do. #}
+  {% set shots = content.field_screenshots|filter((v, k) => k matches '/^\\d+$/') %}
+  {% set scrolls = shots|length > 1 %}
+
+  {% if shots is not empty %}
+    {#
+      Screenshots sit inset in the card with their own rounded frame, rather
+      than running edge to edge: a screenshot is a picture of a screen, and it
+      reads better as an object on the card than as the card's own surface.
+
+      The strip carries no right-hand padding, so the next screenshot runs off
+      the card edge and is clipped. That overhang is the only signal that the
+      strip scrolls – quieter than dots or arrows, and it costs no markup.
+
+      Geometry is the same on every card whatever the image count. Frames are
+      a fixed fraction of the strip and width drives height on a 3:2 box, so
+      anything that varied either the frame fraction or the strip's padding
+      would make one card's screenshots taller than its neighbour's and knock
+      the row's titles out of line. A lone screenshot is centred instead, so
+      that it reads as inset rather than as a stalled scroll.
+
+      `relative` clips absolutely positioned descendants to the scroller. The
+      `3_2_card` media display hides its field label rather than rendering it
+      visually-hidden, which is what used to escape this box and stretch the
+      document sideways in Chrome; this keeps anything similar contained.
+
+      Only a strip with something to scroll takes focus. Chrome makes scroll
+      containers keyboard-focusable by itself, Safari does not, so the
+      tabindex is what makes arrow-key scrolling work everywhere – and the
+      group label stops it announcing as an unnamed region.
+    #}
+    <div class="relative flex snap-x snap-mandatory gap-4 overflow-x-auto p-4 pr-0 scroll-pl-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-rust md:p-6 md:pr-0 md:scroll-pl-6"
+      {%- if scrolls %} tabindex="0" role="group" aria-label="{{ 'Screenshots of @title'|t({'@title': node.label}) }}"{% endif %}>
+      {% for item in shots %}
+        <div class="aspect-3/2 w-5/6 shrink-0 snap-start overflow-hidden rounded-2xl border border-ink/10 [&_img]:size-full [&_img]:object-cover {{ scrolls ? '' : 'mx-auto' }}">
+          {{ item }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# `grow` here rather than `mt-auto` on the lower third – same result,
+     no top margin (spacing convention: margin-bottom and gap only). #}
+  <div class="grow flex flex-col gap-3 p-4 md:p-6">
+    {# h2: the page's h1 is 'Work' and each card is a top-level section under
+       it, so there is no intermediate heading to sit beneath. #}
+    {% if label %}
+      <h2>{{ label }}</h2>
+    {% endif %}
+
+    {% if content.field_role|render|trim is not empty %}
+      <p class="text-base text-ink-muted">{{ content.field_role }}</p>
+    {% endif %}
+
+    {{ content.field_description }}
+  </div>
+
+  {# Lower third: pinned to the bottom so cards of unequal height still line
+     their value statements up across a row. #}
+  {% if content.field_value|render|trim is not empty or content.field_link|render|trim is not empty %}
+    <div class="flex flex-col gap-3 border-t border-ink/10 p-4 md:p-6">
+      {{ content.field_value }}
+      {% if content.field_link|render|trim is not empty %}
+        <div class="text-base [&_a]:text-rust [&_a]:underline [&_a]:underline-offset-4">
+          {{ content.field_link }}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</article>

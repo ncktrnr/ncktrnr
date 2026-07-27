@@ -1,0 +1,19 @@
+uuid: cb85483f-8af4-45dd-993e-3a115bccb376
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_value
+    - node.type.case_study
+id: node.case_study.field_value
+field_name: field_value
+entity_type: node
+bundle: case_study
+label: 'Value statement'
+description: 'One sentence on what the work was for. Shown in the lower third of the card.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

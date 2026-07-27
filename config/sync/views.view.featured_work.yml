@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.full
+    - core.entity_view_mode.node.card
     - node.type.case_study
   module:
     - node
@@ -22,7 +22,7 @@ display:
     display_plugin: default
     position: 0
     display_options:
-      title: 'Selected work'
+      title: ''
       pager:
         type: none
         options:
@@ -73,7 +73,7 @@ display:
       row:
         type: 'entity:node'
         options:
-          view_mode: full
+          view_mode: card
       display_extenders: {  }
     cache_metadata:
       max-age: -1

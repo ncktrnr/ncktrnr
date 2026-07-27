@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Row wrapper for the Selected work view.
+ *
+ * This element is the direct parent of the case-study cards, so the grid
+ * lives here rather than on the page or in the view's configuration.
+ *
+ * One column on small screens, two from md up. Six cards make three even
+ * rows; `items-stretch` keeps cards in a row the same height so their lower
+ * thirds line up.
+ */
+#}
+{% if title %}
+  <h2>{{ title }}</h2>
+{% endif %}
+
+{#
+  Cards were briefly rotated a fraction of a degree each, straightening on
+  hover. It did not earn its place: with six cards on an even grid, all the
+  same width, the tilt read as a rendering fault rather than as a deliberate
+  scatter. Removed rather than tuned – it would want cards of differing sizes
+  to work at all.
+#}
+<div class="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2">
+  {% for row in rows %}
+    <div{{ row.attributes.addClass('flex') }}>
+      {{- row.content -}}
+    </div>
+  {% endfor %}
+</div>
