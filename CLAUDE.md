@@ -95,7 +95,26 @@ commit the diff in `config/sync/` with the related code.
 - Preview on `ncktrnr.ddev.site`: the Browser pane allows `javascript_tool`
   and `resize_window` but blocks screenshots. Measure the DOM in the pane;
   screenshot via headless Chrome – which does **not** apply a mobile viewport,
-  so narrow captures look broken when they are fine.
+  so narrow captures look broken when they are fine. The pane is also no use
+  for anything animated: its compositor can freeze mid-session and stop
+  responding to `javascript_tool` altogether.
+- **Headless Chrome clamps `--window-size` to a 500px floor.** That is the
+  mechanism behind the note above – the screenshot is cropped to the width you
+  asked for while the page lays out at 500, so the nav appears to overflow when
+  it does not. For a true mobile viewport, drive Chrome over CDP and call
+  `Emulation.setDeviceMetricsOverride`; that also gives real wall-clock timing,
+  media emulation (`prefers-reduced-motion`, `prefers-color-scheme`) and real
+  pointer events for `:hover`. There is a working harness in
+  `~/Projects/cc-websites/tools/cdp.mjs`.
+- **`getComputedStyle` lies about a transitioning property under
+  `--virtual-time-budget`.** The animation clock stays at 0 while
+  `document.timeline` advances, so a running transition reads as its start
+  value forever. Read a non-transitioning element instead, or call
+  `el.getAnimations().forEach(a => a.finish())` first. This cost an hour of
+  chasing a phantom bug in CSS that was correct.
+- Give each headless run its own `--user-data-dir` and delete it afterwards.
+  A reused profile carries `localStorage` between runs, which silently
+  pre-seeds any test meant to start with nothing stored.
 - For a dark-mode capture pass headless Chrome `--force-dark-mode` **alone**.
   Adding `--enable-features=WebContentsForceDark` turns on Chrome's auto-dark,
   which inverts the page and yields a confidently wrong screenshot.
@@ -108,3 +127,50 @@ commit the diff in `config/sync/` with the related code.
   reach for `dark:prose-invert`: the `dark` variant here matches only the
   manual `[data-theme]` override, so it misses system dark with no stored
   choice.
+- **A template class change needs `npm run dev`, not just `drush cr`.**
+  Tailwind scans the templates to decide which utilities to emit, so a class
+  added to Twig simply does not exist in the CSS until the build runs – and
+  the symptom is a rule that silently does nothing.
+
+## Motion (M4, July 2026)
+
+- **One gate for everything.** Tailwind's built-in `motion-safe` and
+  `motion-reduce` variants are redefined in `css/tailwind.css` with
+  `@custom-variant`, keyed off `data-motion` on `<html>`: absent = follow the
+  OS, `reduced` = off regardless, `full` = on regardless. Utilities in
+  templates get this for free; hand-written CSS opts in with v4's `@variant`
+  at-rule (`.thing { @variant motion-safe { … } }`). Don't add a third variant
+  name or a fresh `prefers-reduced-motion` media query.
+- **JS that cannot be gated by CSS reads the answer, it does not work it out.**
+  `js/motion-toggle.js` publishes `data-motion-resolved` on `<html>` ('full' or
+  'reduced', OS and stored choice already reconciled) and fires
+  `ncktrnr:motionchange` on `document` when it changes, with the same value in
+  `detail.motion`. The attribute is for the initial read – no event fires on
+  load. `js/lottie-motion.js` is the worked example; the video lead items will
+  want the same pair.
+- **`.reveal` belongs to the logo's expanding mask** (`.logo .reveal`). Scroll
+  reveals are `.rise` / `.rise-stagger`. A generic `.reveal` landed straight on
+  the logo and was invisible in screenshots – check what a new class name
+  already matches before using it.
+- **Reveals must not be able to hide content.** `.rise`'s hidden state exists
+  only as the keyframe's `from`, held by `animation-fill-mode: both`, and the
+  whole rule sits inside `@supports (animation-timeline: view())`. Never add a
+  standalone `opacity: 0` – without support, or with motion off, nothing should
+  be set at all and the finished page simply shows.
+- Scroll-driven animations need an `animation-range`. With the range left at
+  `normal` a `scroll(root)` timeline spends its distance over the whole
+  document, so the effect weakens as the page grows and differs per device.
+- The day/night crossfade transitions **registered** `--tone-*` properties on
+  `:root`; an unregistered custom property is a string and can only flip.
+  `--tone-line` and `--tone-rust-tint` are deliberately left unregistered –
+  they are `color-mix()` over other tokens and re-substitute their `var()`
+  references every frame, so they follow along for free.
+- Crossfading a theme means text and background swap, so they must cross:
+  body text passes through about **1.1:1** mid-fade. The trough is geometric –
+  its depth does not change with duration, only how long it lasts. Fading the
+  pair separately is worse, not better.
+- `lottie-player` freezes itself when scrolled out of view, so
+  `currentState: "frozen"` for the footer dino is normal, not a fault. Its
+  `autoplay`/`loop` are HTML attributes read at upgrade time and are therefore
+  kept **off** the markup – `js/lottie-motion.js` starts it. `hover` was inert
+  alongside `autoplay` and would have come alive when autoplay was removed.
