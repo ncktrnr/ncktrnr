@@ -88,8 +88,10 @@
 
   {% if page.footer %}
     <footer role="contentinfo" class="relative border-t-2 border-neutral-600 min-h-24">
+    {# No autoplay/loop attributes – see page--front.html.twig; the player is
+       started by js/lottie-motion.js only when motion is allowed. #}
     <div class="absolute -top-17 right-10">
-      <lottie-player src="/themes/custom/ncktrnr_tw/lottie/dino.json" background="transparent" speed="1" style="width: 200px; height: 80px;" loop hover autoplay></lottie-player>
+      <lottie-player src="/themes/custom/ncktrnr_tw/lottie/dino.json" background="transparent" speed="1" style="width: 200px; height: 80px;"></lottie-player>
       <noscript>{% include '@ncktrnr_tw/images/dino-vegan.svg' %}</noscript>
     </div>
       {{ page.footer }}

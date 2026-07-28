@@ -36,13 +36,19 @@
   <head>
     <head-placeholder token="{{ placeholder_token }}">
     <title>{{ head_title|safe_join(' | ') }}</title>
-    {# Apply a stored theme choice before first paint so there's no flash;
-       no stored choice = the CSS follows prefers-color-scheme #}
+    {# Apply the stored theme and motion choices before first paint. With no
+       stored choice the CSS follows prefers-color-scheme / prefers-reduced-
+       motion. Motion needs this more than colour does: applied any later, a
+       page starts animating and then stops. #}
     <script>
       try {
         var theme = localStorage.getItem('theme');
         if (theme === 'light' || theme === 'dark') {
           document.documentElement.dataset.theme = theme;
+        }
+        var motion = localStorage.getItem('motion');
+        if (motion === 'full' || motion === 'reduced') {
+          document.documentElement.dataset.motion = motion;
         }
       } catch (e) {}
     </script>

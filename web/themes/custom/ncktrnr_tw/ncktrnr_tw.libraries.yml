@@ -127,6 +127,17 @@ theme_toggle:
       attributes:
         defer: true
 
+motion_toggle:
+  js:
+    js/motion-toggle.js:
+      attributes:
+        defer: true
+
 lottie_player:
   js:
     https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js: { type: external, minified: true, attributes: { defer: true } }
+    js/lottie-motion.js:
+      attributes:
+        defer: true
+  dependencies:
+    - ncktrnr_tw/motion_toggle

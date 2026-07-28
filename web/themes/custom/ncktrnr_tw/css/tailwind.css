@@ -7,11 +7,72 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ---------------------------------------------------------------------------
+   Motion gate. These redefine Tailwind's *built-in* motion-safe and
+   motion-reduce variants so both also answer to a manual override –
+   data-motion on <html>, set by js/motion-toggle.js. Three states:
+
+     attribute absent    follow prefers-reduced-motion
+     data-motion=reduced motion off whatever the OS says
+     data-motion=full    motion on whatever the OS says
+
+   Redefining the built-ins rather than adding a third variant name means
+   every `motion-reduce:` utility already in the templates inherits the
+   override with no edits. Hand-written CSS reaches the same gate through
+   v4's `@variant` at-rule (`@variant motion-safe { … }`), so utilities and
+   custom CSS share one mechanism – in pure CSS, with no JS involved in the
+   default behaviour.
+
+   Each branch is wrapped in :where() so the variant contributes no
+   specificity of its own, exactly as the built-in media-query variants do.
+--------------------------------------------------------------------------- */
+@custom-variant motion-safe {
+    @media (prefers-reduced-motion: no-preference) {
+        &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) { @slot; }
+    }
+    &:where([data-motion="full"] *, [data-motion="full"]) { @slot; }
+}
+
+@custom-variant motion-reduce {
+    @media (prefers-reduced-motion: reduce) {
+        &:where(:root:not([data-motion="full"]) *, :root:not([data-motion="full"])) { @slot; }
+    }
+    &:where([data-motion="reduced"] *, [data-motion="reduced"]) { @slot; }
+}
+
+/* ---------------------------------------------------------------------------
    v2 design tokens – from Figma `ncktrnr.com` (8hxwpK5nd45OX5jC0OsGyN),
    frames `Home latest` 151:10 and `work page latest` 152:6102.
    Light values are Figma's; dark values are derived (no dark frames) –
    eyeball on /themes/custom/ncktrnr_tw/styleguide.html and adjust there.
 --------------------------------------------------------------------------- */
+
+/* An unregistered custom property is just a string to the cascade, so it can
+   only ever flip between values. Registering these gives them a type, which
+   makes them interpolable – which is what lets the whole day/night swap be
+   transitioned rather than snapped. See the crossfade rule below the value
+   blocks.
+
+   Only the concrete colours are registered. --tone-line and --tone-rust-tint
+   are color-mix() over --tone-ink and --tone-rust, and an unregistered
+   property re-substitutes its var() references on every frame, so those two
+   follow their referents through the fade for nothing. Registering them would
+   also mean inventing an initial-value, which cannot contain var(). */
+@property --night {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
+@property --tone-paper { syntax: "<color>"; inherits: true; initial-value: #fffaef; }
+@property --tone-surface { syntax: "<color>"; inherits: true; initial-value: #f4f2ec; }
+@property --tone-card { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --tone-sky { syntax: "<color>"; inherits: true; initial-value: #eef9ff; }
+@property --tone-ink { syntax: "<color>"; inherits: true; initial-value: #121212; }
+@property --tone-ink-muted { syntax: "<color>"; inherits: true; initial-value: #636363; }
+@property --tone-rust { syntax: "<color>"; inherits: true; initial-value: #c93811; }
+@property --tone-leaf { syntax: "<color>"; inherits: true; initial-value: #57a636; }
+@property --tone-leaf-bright { syntax: "<color>"; inherits: true; initial-value: #a4d43d; }
+@property --tone-leaf-deep { syntax: "<color>"; inherits: true; initial-value: #476841; }
 
 :root {
     /* surfaces */
@@ -39,8 +100,7 @@
     --tone-leaf-deep: #476841;
 
     /* 0 = day, 1 = night. Drives the hero's light/dark layer swap without
-       repeating the three selector blocks; M4 transitions it for the
-       day-fades-to-night crossfade. */
+       repeating the three selector blocks, and the theme toggle's icons. */
     --night: 0;
 }
 
@@ -82,6 +142,43 @@
         --tone-leaf-deep: #86a878;
 
         --night: 1;
+    }
+}
+
+/* Day fades to night. One transition on the root carries the whole page:
+   everything visual here resolves from these tokens, so interpolating them at
+   the root means every surface, rule and piece of text dissolves together,
+   with no per-element transitions to keep in step.
+
+   --night alone was not enough. It covers the hero sky, the back layer's
+   day/night pair and the toggle icons, but the tokens drive the intro box,
+   the nav pill, the card surfaces and all the text – so fading only --night
+   left the box turning dark navy while the sky behind it was still daylight.
+
+   Transitions never run on a first style computation, so the stored theme
+   applied by the inline script in html.html.twig still arrives without a fade
+   on load.
+
+   250ms rather than something more leisurely, because text and its background
+   swap places: any simultaneous fade between dark-on-light and light-on-dark
+   has to pass through a point where the two meet, and body text measures
+   about 1.1:1 there. The trough is geometric, so its depth does not change
+   with duration – only how long it lasts (measured 2026-07-28: 117ms under
+   AA at 400ms, 83ms at 250ms). Fading them separately is worse, not better:
+   whichever of the pair moves first spends the entire transition invisible
+   against the other.
+
+   Gated on motion-safe: with motion off the theme still switches, it just
+   arrives at once rather than dissolving. */
+:root {
+    @variant motion-safe {
+        transition-property:
+            --night,
+            --tone-paper, --tone-surface, --tone-card, --tone-sky,
+            --tone-ink, --tone-ink-muted,
+            --tone-rust, --tone-leaf, --tone-leaf-bright, --tone-leaf-deep;
+        transition-duration: 250ms;
+        transition-timing-function: ease-in-out;
     }
 }
 
@@ -203,29 +300,120 @@
     .theme-toggle .tt-sun { opacity: var(--night); }
     .theme-toggle .tt-moon { opacity: calc(1 - var(--night)); }
 
-    /* M4 taster (2026-07-14): far layers lag behind the scroll, so the
-       garden pulls apart in depth as the hero leaves the viewport – back
-       lags most, top travels with the page. The keyframe animates
-       `transform`, which composes with the utility centring (v4's
-       -translate-x-1/2 uses the separate `translate` property).
-       Scroll-driven animation: Chrome/Edge/Safari 26+; other browsers stay
-       static – the intended fallback. Full treatment incl. the manual
-       motion toggle lands in M4. */
+    /* Motion toggle – the icons swap on the motion gate itself, so the button
+       reports the resolved state (OS preference or manual override) without
+       any JS deciding which glyph to show */
+    .motion-toggle .mt-on {
+        opacity: 0;
+        @variant motion-safe { opacity: 1; }
+    }
+    .motion-toggle .mt-off {
+        opacity: 1;
+        @variant motion-safe { opacity: 0; }
+    }
+
+    /* Hero parallax: the far layers lag behind the scroll, so the garden
+       pulls apart in depth as the hero leaves the viewport – back lags most,
+       top travels with the page.
+
+       The foreground layer is deliberately left static rather than made the
+       fastest. Every layer is bottom-anchored inside the overflow-hidden
+       hero, so moving the foreground *up* would lift its base off the hero's
+       bottom edge and open a gap on the seam with the section below. Lagging
+       the two behind it reads as the same depth with nothing to go wrong.
+
+       The keyframe animates `transform`, which composes with the utility
+       centring (v4's -translate-x-1/2 uses the separate `translate`
+       property). Scroll-driven animation: Chrome/Edge/Safari 26+; other
+       browsers stay static, which is the intended fallback here – a hero
+       that does not drift is simply a hero. */
     @supports (animation-timeline: scroll()) {
-        @media (prefers-reduced-motion: no-preference) {
-            .parallax-back,
-            .parallax-mid {
+        .parallax-back,
+        .parallax-mid {
+            @variant motion-safe {
                 animation: hero-lag linear both;
                 /* scroll(root), not scroll(): the hero's overflow-hidden
                    makes it the 'nearest scroller', which never scrolls */
                 animation-timeline: scroll(root);
+                /* Spend the drift over the first viewport of scrolling, which
+                   is the stretch where the hero is on screen. Without a range
+                   it is spread over the whole document instead, so the effect
+                   both weakens as the page grows and differs by device: with
+                   the range left at `normal`, only 60% of the drift had
+                   happened by the time the hero left the viewport at
+                   1400×900, and 32% at 390×844. 100vh rather than the hero's
+                   own height because the hero is `h-auto` below md, where its
+                   height is content-driven and no longer known here. */
+                animation-range: 0 100vh;
             }
-            .parallax-back { --lag: 110px; }
-            .parallax-mid { --lag: 55px; }
+        }
+        /* Drift distances. The layers are bottom-anchored, so the lag is also
+           how far each one's base slides below the hero's bottom edge and is
+           clipped – which is why the far layer cannot simply be pushed
+           further. Below md the layer artwork is shorter (504px against
+           788px) while the hero is taller, so the same distance eats a much
+           larger share of the garden; the drift is scaled back to suit. */
+        .parallax-back { --lag: 180px; }
+        .parallax-mid { --lag: 90px; }
+
+        @media (width < 48rem) {
+            .parallax-back { --lag: 90px; }
+            .parallax-mid { --lag: 45px; }
         }
     }
     @keyframes hero-lag {
         to { transform: translateY(var(--lag)); }
+    }
+
+    /* -----------------------------------------------------------------------
+       Reveal on scroll. Sections rise and fade in as they enter the viewport,
+       driven by `animation-timeline: view()` – no IntersectionObserver, and
+       so no JS at all.
+
+       The whole rule sits inside @supports, which is what makes the fallback
+       safe. A reveal that starts at opacity 0 and never runs is invisible
+       content, not graceful degradation, so a browser without scroll-driven
+       animation must never see the hidden state. Here the hidden state exists
+       only as the keyframe's `from`, held by `animation-fill-mode: both` –
+       so it cannot apply unless the animation itself is running. Without
+       @supports, or with motion off, nothing is set and the finished page is
+       simply there. That is also why this reverses the motion inventory's
+       'CSS + IntersectionObserver fallback': there is nothing left to fall
+       back to.
+
+       `translate` rather than a transform, so it composes with any transform
+       utilities on the same element.
+
+       Named `rise`, not `reveal`: the logo's expanding mask already owns
+       `.reveal` (see .logo .reveal below), and a generic reveal class landed
+       straight on it.
+    ----------------------------------------------------------------------- */
+    @supports (animation-timeline: view()) {
+        .rise {
+            @variant motion-safe {
+                animation: rise linear both;
+                animation-timeline: view();
+                /* Spent over the element's entry into the viewport, finishing
+                   well before it is fully in view – a reveal that completes
+                   at the centre of the screen reads as arriving late. */
+                animation-range: entry var(--rise-start, 0%) entry var(--rise-end, 60%);
+            }
+        }
+
+        /* Rows of siblings cascade instead of arriving together: they enter
+           the viewport at the same moment, so the offset has to come from the
+           range rather than from a delay, which scroll timelines have no
+           equivalent of. */
+        .rise-stagger > .rise:nth-child(2) { --rise-start: 15%; --rise-end: 75%; }
+        .rise-stagger > .rise:nth-child(3) { --rise-start: 30%; --rise-end: 90%; }
+
+        /* Two-up grids cascade by column instead of by position, so the offset
+           repeats on every row rather than running out after the second card */
+        .rise-stagger-2 > .rise:nth-child(even) { --rise-start: 15%; --rise-end: 75%; }
+    }
+    @keyframes rise {
+        from { opacity: 0; translate: 0 1.5rem; }
+        to { opacity: 1; translate: 0 0; }
     }
 
     /* Anchor stays full width for reliable clicks */
@@ -283,12 +471,18 @@
     /* Reduced motion: no reveal animation. The static full-name layout needs
        mask width and letter positions to agree, so it is gated to widths
        that fit it – below that the abbreviated resting state applies */
-    @media (prefers-reduced-motion: reduce) {
-        .logo .reveal { transition: none; }
-        .logo .char { transition: none !important; }
-        @media (width >= 48rem) {
-            .logo .reveal { width: var(--full-w, var(--logo-full-fallback)); }
-            .logo .char { transform: translateX(0) !important; opacity: 1 !important; }
+    .logo .reveal {
+        @variant motion-reduce { transition: none; }
+    }
+    .logo .char {
+        @variant motion-reduce { transition: none !important; }
+    }
+    @media (width >= 48rem) {
+        .logo .reveal {
+            @variant motion-reduce { width: var(--full-w, var(--logo-full-fallback)); }
+        }
+        .logo .char {
+            @variant motion-reduce { transform: translateX(0) !important; opacity: 1 !important; }
         }
     }
 
@@ -300,11 +494,13 @@
        line art; its baked black/white is remapped to the theme tokens so
        it reads in both modes.
     ----------------------------------------------------------------------- */
-    .dragonfly-hero { animation: dfly-bob 4s ease-in-out infinite alternate; }
+    .dragonfly-hero {
+        @variant motion-safe { animation: dfly-bob 4s ease-in-out infinite alternate; }
+    }
     .dragonfly-hero [id^="dfly-wing"] {
         transform-box: fill-box;
         transform-origin: center;
-        animation: dfly-flutter 5s ease-in-out infinite;
+        @variant motion-safe { animation: dfly-flutter 5s ease-in-out infinite; }
     }
     @keyframes dfly-bob {
         to { transform: translateY(3px); }
@@ -315,10 +511,6 @@
         0%, 5%, 10%, 15%, 20% { transform: scaleX(1); }
         2.5%, 7.5%, 12.5%, 17.5%, 22.5% { transform: scaleX(0.7); }
         25%, 100% { transform: scaleX(1); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-        .dragonfly-hero,
-        .dragonfly-hero [id^="dfly-wing"] { animation: none; }
     }
 
       /* High-contrast and forced-colors adjustments */

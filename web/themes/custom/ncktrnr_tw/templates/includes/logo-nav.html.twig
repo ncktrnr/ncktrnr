@@ -1,8 +1,9 @@
 {{ attach_library('ncktrnr_tw/theme_toggle') }}
+{{ attach_library('ncktrnr_tw/motion_toggle') }}
 
 {# container has no auto-centring in Tailwind v4 – mx-auto does it.
-   relative anchors the theme toggle, which sits outside the nav pill;
-   the extra right padding below md stops the pill running under it #}
+   relative anchors the two toggles, which sit outside the nav pill;
+   the extra right padding below md stops the pill running under them #}
 <div class="container mx-auto p-4 relative max-md:pr-14">
   <nav class="primary-nav" role="navigation" aria-label="Primary">
     <a href="{{ path('<front>') }}" class="logo js-logo inline-flex items-center select-none whitespace-nowrap rounded py-2 focus-visible:outline focus-visible:outline-ink focus-visible:outline-offset-2" aria-label="Nick Turner">
@@ -26,17 +27,50 @@
     </div>
   </nav>
 
-  {# Theme toggle – outside the pill (Figma 151:10): mode switching isn't a
-     nav choice, and the motion toggle joins it here in M4. Sets data-theme
-     on <html> and stores the choice; no choice = follow the system
-     (js/theme-toggle.js). Both icons render – --night decides which shows #}
-  <button type="button" class="theme-toggle js-theme-toggle absolute right-6 top-1/2 -translate-y-1/2 size-6 cursor-pointer text-ink hover:text-ink-muted transition-colors rounded focus-visible:outline focus-visible:outline-ink focus-visible:outline-offset-2" aria-label="Switch theme">
-    <svg class="tt-moon absolute inset-0 size-6 transition-opacity motion-reduce:transition-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-    <svg class="tt-sun absolute inset-0 size-6 transition-opacity motion-reduce:transition-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="5"/>
-      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-    </svg>
-  </button>
+  {# Theme and motion toggles – outside the pill (Figma 151:10): neither is a
+     nav choice. Each sets an attribute on <html> and stores it; with nothing
+     stored, both follow the system setting.
+
+     Stacked below lg, side by side above it. The pill is centred at max-w-2xl
+     inside the container, so the slack to its right is what the toggles have
+     to live in: that slack is only ~32px from 768px up to 1024px, where the
+     container is fixed at 768 wide. A 60px row overlaps the pill's links
+     there; a 24px column clears them at every width down to 320px. #}
+  {% set toggle = 'relative size-6 shrink-0 cursor-pointer text-ink hover:text-ink-muted transition-colors rounded focus-visible:outline focus-visible:outline-ink focus-visible:outline-offset-2' %}
+  {% set toggle_icon = 'absolute inset-0 size-6 transition-opacity motion-reduce:transition-none' %}
+  <div class="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3 max-lg:flex-col max-lg:gap-2">
+
+    {# Motion toggle – data-motion on <html>, read by the motion-safe /
+       motion-reduce variants in tailwind.css (js/motion-toggle.js). Both icons
+       render and the same variants decide which shows, so the button reports
+       the resolved state without JS choosing a glyph #}
+    <button type="button" class="motion-toggle js-motion-toggle {{ toggle }}" aria-label="Turn animation off">
+      <svg class="mt-on {{ toggle_icon }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="2"/>
+        <path d="M16.24 7.76a6 6 0 0 1 0 8.48M7.76 16.24a6 6 0 0 1 0-8.48"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/>
+      </svg>
+      {# Off is a struck-through ring, not the waves struck through: the arc
+         endpoints sit at 45°, exactly where a diagonal crosses them, and the
+         two read as a scribble at 24px – which is the only size that matters
+         here. A plain ring and slash reads as 'off' at a glance, and the
+         contrast with the waves is what a state toggle needs #}
+      <svg class="mt-off {{ toggle_icon }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.5"/>
+        <path d="M5.2 18.8 18.8 5.2"/>
+      </svg>
+    </button>
+
+    {# Theme toggle – data-theme on <html>; both icons render and --night
+       decides which shows (js/theme-toggle.js) #}
+    <button type="button" class="theme-toggle js-theme-toggle {{ toggle }}" aria-label="Switch theme">
+      <svg class="tt-moon {{ toggle_icon }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="tt-sun {{ toggle_icon }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </div>
 </div>

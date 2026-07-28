@@ -82,7 +82,9 @@
         <div class="container mx-auto px-4 py-16 lg:py-24">
           {# striptags: the field stores a paragraph; only its text belongs
              inside the h2 #}
-          <h2 id="columns-heading" class="text-center max-w-3xl mx-auto">{{ node.field_content.0.value|striptags|trim }}</h2>
+          {# rises on its own default range rather than joining the stagger:
+             it sits above the grid, so it enters first and leads the cascade #}
+          <h2 id="columns-heading" class="rise text-center max-w-3xl mx-auto">{{ node.field_content.0.value|striptags|trim }}</h2>
           {# icons keyed by column position – a 4th column simply gets none;
              heights differ on purpose (the seedhead blows up and away) #}
           {% set icons = [
@@ -90,9 +92,11 @@
             { file: 'create', size: 'h-32' },
             { file: 'communicate', size: 'h-64' },
           ] %}
-          <div class="grid md:grid-cols-3 gap-10 mt-14">
+          {# rise-stagger + rise: the three columns rise in as they enter the
+             viewport, offset so they cascade (see tailwind.css) #}
+          <div class="grid md:grid-cols-3 gap-10 mt-14 rise-stagger">
             {% for item in node.field_columns %}
-              <div class="text-lg [&_p]:mt-3 [&_p:last-child]:text-base [&_p:last-child]:text-ink-muted">
+              <div class="rise text-lg [&_p]:mt-3 [&_p:last-child]:text-base [&_p:last-child]:text-ink-muted">
                 {% if icons[loop.index0] is defined %}
                   <div class="flex items-end h-40 mb-6">
                     <img src="/themes/custom/ncktrnr_tw/images/column-icons/{{ icons[loop.index0].file }}.svg" alt="" class="{{ icons[loop.index0].size }} w-auto">
@@ -109,7 +113,9 @@
     {# Let's connect – copy from field_connect #}
     {% if node.hasField('field_connect') and not node.field_connect.isEmpty %}
       <section aria-labelledby="connect-heading">
-        <div class="container mx-auto px-4 py-16 lg:py-24 grid md:grid-cols-[14rem_1fr] gap-8 max-w-5xl">
+        {# rises as one unit: the heading and the text sit side by side, so
+           cascading them would fire the two halves of one line separately #}
+        <div class="rise container mx-auto px-4 py-16 lg:py-24 grid md:grid-cols-[14rem_1fr] gap-8 max-w-5xl">
           <h2 id="connect-heading">Let’s connect</h2>
           <div class="text-lg [&_p+p]:mt-4 [&_a]:underline [&_a:hover]:text-rust">
             {{ node.field_connect.processed }}
@@ -127,8 +133,12 @@
     <div class="footer-fly absolute -top-14 left-10 w-16" aria-hidden="true">
       {% include '@ncktrnr_tw/images/footer-fly.svg' %}
     </div>
+    {# No autoplay/loop attributes: the player reads them as it upgrades, which
+       no stylesheet can gate, so js/lottie-motion.js starts it instead – only
+       when motion is allowed. `hover` is gone with them; it never had any
+       effect while autoplay was set. #}
     <div class="absolute -top-17 right-10">
-      <lottie-player src="/themes/custom/ncktrnr_tw/lottie/dino.json" background="transparent" speed="1" style="width: 200px; height: 80px;" loop hover autoplay></lottie-player>
+      <lottie-player src="/themes/custom/ncktrnr_tw/lottie/dino.json" background="transparent" speed="1" style="width: 200px; height: 80px;"></lottie-player>
       <noscript>{% include '@ncktrnr_tw/images/dino-vegan.svg' %}</noscript>
     </div>
       {{ page.footer }}

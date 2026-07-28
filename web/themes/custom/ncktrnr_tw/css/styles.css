@@ -799,6 +799,9 @@
   .w-full {
     width: 100%;
   }
+  .max-w-2xl {
+    max-width: var(--container-2xl);
+  }
   .max-w-3xl {
     max-width: var(--container-3xl);
   }
@@ -1083,6 +1086,10 @@
   .underline {
     text-decoration-line: underline;
   }
+  .ring {
+    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
   .blur {
     --tw-blur: blur(8px);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
@@ -1185,7 +1192,22 @@
   }
   .motion-reduce\:transition-none {
     @media (prefers-reduced-motion: reduce) {
+      &:where(:root:not([data-motion="full"]) *, :root:not([data-motion="full"])) {
+        transition-property: none;
+      }
+    }
+    &:where([data-motion="reduced"] *, [data-motion="reduced"]) {
       transition-property: none;
+    }
+  }
+  .max-lg\:flex-col {
+    @media (width < 64rem) {
+      flex-direction: column;
+    }
+  }
+  .max-lg\:gap-2 {
+    @media (width < 64rem) {
+      gap: calc(var(--spacing) * 2);
     }
   }
   .max-md\:relative {
@@ -1553,6 +1575,61 @@
     }
   }
 }
+@property --night {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --tone-paper {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #fffaef;
+}
+@property --tone-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f4f2ec;
+}
+@property --tone-card {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+@property --tone-sky {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #eef9ff;
+}
+@property --tone-ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #121212;
+}
+@property --tone-ink-muted {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #636363;
+}
+@property --tone-rust {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c93811;
+}
+@property --tone-leaf {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #57a636;
+}
+@property --tone-leaf-bright {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #a4d43d;
+}
+@property --tone-leaf-deep {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #476841;
+}
 :root {
   --tone-paper: #fffaef;
   --tone-surface: #f4f2ec;
@@ -1616,6 +1693,20 @@
     --tone-leaf-bright: #b6de5a;
     --tone-leaf-deep: #86a878;
     --night: 1;
+  }
+}
+:root {
+  @media (prefers-reduced-motion: no-preference) {
+    &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) {
+      transition-property: --night, --tone-paper, --tone-surface, --tone-card, --tone-sky, --tone-ink, --tone-ink-muted, --tone-rust, --tone-leaf, --tone-leaf-bright, --tone-leaf-deep;
+      transition-duration: 250ms;
+      transition-timing-function: ease-in-out;
+    }
+  }
+  &:where([data-motion="full"] *, [data-motion="full"]) {
+    transition-property: --night, --tone-paper, --tone-surface, --tone-card, --tone-sky, --tone-ink, --tone-ink-muted, --tone-rust, --tone-leaf, --tone-leaf-bright, --tone-leaf-deep;
+    transition-duration: 250ms;
+    transition-timing-function: ease-in-out;
   }
 }
 @layer base {
@@ -1710,23 +1801,99 @@
   .theme-toggle .tt-moon {
     opacity: calc(1 - var(--night));
   }
-  @supports (animation-timeline: scroll()) {
+  .motion-toggle .mt-on {
+    opacity: 0;
     @media (prefers-reduced-motion: no-preference) {
-      .parallax-back, .parallax-mid {
+      &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) {
+        opacity: 1;
+      }
+    }
+    &:where([data-motion="full"] *, [data-motion="full"]) {
+      opacity: 1;
+    }
+  }
+  .motion-toggle .mt-off {
+    opacity: 1;
+    @media (prefers-reduced-motion: no-preference) {
+      &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) {
+        opacity: 0;
+      }
+    }
+    &:where([data-motion="full"] *, [data-motion="full"]) {
+      opacity: 0;
+    }
+  }
+  @supports (animation-timeline: scroll()) {
+    .parallax-back, .parallax-mid {
+      @media (prefers-reduced-motion: no-preference) {
+        &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) {
+          animation: hero-lag linear both;
+          animation-timeline: scroll(root);
+          animation-range: 0 100vh;
+        }
+      }
+      &:where([data-motion="full"] *, [data-motion="full"]) {
         animation: hero-lag linear both;
         animation-timeline: scroll(root);
+        animation-range: 0 100vh;
       }
+    }
+    .parallax-back {
+      --lag: 180px;
+    }
+    .parallax-mid {
+      --lag: 90px;
+    }
+    @media (width < 48rem) {
       .parallax-back {
-        --lag: 110px;
+        --lag: 90px;
       }
       .parallax-mid {
-        --lag: 55px;
+        --lag: 45px;
       }
     }
   }
   @keyframes hero-lag {
     to {
       transform: translateY(var(--lag));
+    }
+  }
+  @supports (animation-timeline: view()) {
+    .rise {
+      @media (prefers-reduced-motion: no-preference) {
+        &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) {
+          animation: rise linear both;
+          animation-timeline: view();
+          animation-range: entry var(--rise-start, 0%) entry var(--rise-end, 60%);
+        }
+      }
+      &:where([data-motion="full"] *, [data-motion="full"]) {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry var(--rise-start, 0%) entry var(--rise-end, 60%);
+      }
+    }
+    .rise-stagger > .rise:nth-child(2) {
+      --rise-start: 15%;
+      --rise-end: 75%;
+    }
+    .rise-stagger > .rise:nth-child(3) {
+      --rise-start: 30%;
+      --rise-end: 90%;
+    }
+    .rise-stagger-2 > .rise:nth-child(even) {
+      --rise-start: 15%;
+      --rise-end: 75%;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      translate: 0 1.5rem;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
     }
   }
   .logo {
@@ -1796,30 +1963,71 @@
       opacity: 1;
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .logo .reveal {
+  .logo .reveal {
+    @media (prefers-reduced-motion: reduce) {
+      &:where(:root:not([data-motion="full"]) *, :root:not([data-motion="full"])) {
+        transition: none;
+      }
+    }
+    &:where([data-motion="reduced"] *, [data-motion="reduced"]) {
       transition: none;
     }
-    .logo .char {
+  }
+  .logo .char {
+    @media (prefers-reduced-motion: reduce) {
+      &:where(:root:not([data-motion="full"]) *, :root:not([data-motion="full"])) {
+        transition: none !important;
+      }
+    }
+    &:where([data-motion="reduced"] *, [data-motion="reduced"]) {
       transition: none !important;
     }
-    @media (width >= 48rem) {
-      .logo .reveal {
+  }
+  @media (width >= 48rem) {
+    .logo .reveal {
+      @media (prefers-reduced-motion: reduce) {
+        &:where(:root:not([data-motion="full"]) *, :root:not([data-motion="full"])) {
+          width: var(--full-w, var(--logo-full-fallback));
+        }
+      }
+      &:where([data-motion="reduced"] *, [data-motion="reduced"]) {
         width: var(--full-w, var(--logo-full-fallback));
       }
-      .logo .char {
+    }
+    .logo .char {
+      @media (prefers-reduced-motion: reduce) {
+        &:where(:root:not([data-motion="full"]) *, :root:not([data-motion="full"])) {
+          transform: translateX(0) !important;
+          opacity: 1 !important;
+        }
+      }
+      &:where([data-motion="reduced"] *, [data-motion="reduced"]) {
         transform: translateX(0) !important;
         opacity: 1 !important;
       }
     }
   }
   .dragonfly-hero {
-    animation: dfly-bob 4s ease-in-out infinite alternate;
+    @media (prefers-reduced-motion: no-preference) {
+      &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) {
+        animation: dfly-bob 4s ease-in-out infinite alternate;
+      }
+    }
+    &:where([data-motion="full"] *, [data-motion="full"]) {
+      animation: dfly-bob 4s ease-in-out infinite alternate;
+    }
   }
   .dragonfly-hero [id^="dfly-wing"] {
     transform-box: fill-box;
     transform-origin: center;
-    animation: dfly-flutter 5s ease-in-out infinite;
+    @media (prefers-reduced-motion: no-preference) {
+      &:where(:root:not([data-motion="reduced"]) *, :root:not([data-motion="reduced"])) {
+        animation: dfly-flutter 5s ease-in-out infinite;
+      }
+    }
+    &:where([data-motion="full"] *, [data-motion="full"]) {
+      animation: dfly-flutter 5s ease-in-out infinite;
+    }
   }
   @keyframes dfly-bob {
     to {
@@ -1835,11 +2043,6 @@
     }
     25%, 100% {
       transform: scaleX(1);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .dragonfly-hero, .dragonfly-hero [id^="dfly-wing"] {
-      animation: none;
     }
   }
   @media (prefers-contrast: more) {
@@ -1959,6 +2162,71 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
 @property --tw-blur {
   syntax: "*";
   inherits: false;
@@ -2063,6 +2331,19 @@
 }
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    :root, :host {
+      --night: 0;
+      --tone-paper: #fffaef;
+      --tone-surface: #f4f2ec;
+      --tone-card: #ffffff;
+      --tone-sky: #eef9ff;
+      --tone-ink: #121212;
+      --tone-ink-muted: #636363;
+      --tone-rust: #c93811;
+      --tone-leaf: #57a636;
+      --tone-leaf-bright: #a4d43d;
+      --tone-leaf-deep: #476841;
+    }
     *, ::before, ::after, ::backdrop {
       --tw-translate-x: 0;
       --tw-translate-y: 0;
@@ -2077,6 +2358,20 @@
       --tw-border-style: solid;
       --tw-leading: initial;
       --tw-font-weight: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
       --tw-blur: initial;
       --tw-brightness: initial;
       --tw-contrast: initial;

@@ -22,9 +22,13 @@
   scatter. Removed rather than tuned – it would want cards of differing sizes
   to work at all.
 #}
-<div class="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2">
+{#
+  rise-stagger-2 + rise: cards rise in as they enter the viewport, the
+  right-hand card of each row trailing its neighbour (see tailwind.css).
+#}
+<div class="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 rise-stagger-2">
   {% for row in rows %}
-    <div{{ row.attributes.addClass('flex') }}>
+    <div{{ row.attributes.addClass('flex', 'rise') }}>
       {{- row.content -}}
     </div>
   {% endfor %}
