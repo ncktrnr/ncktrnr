@@ -118,6 +118,11 @@
     });
     for (let i = 0; i < str.length; i++) {
       const s = document.createElement('span');
+      // copyType() styles the wrapper, not these. Without `font: inherit` the
+      // stylesheet's own rule for `span` wins here and the characters are
+      // measured in the body face while the visible logo renders in the
+      // wordmark face – so every letter is positioned to the wrong metrics.
+      s.style.font = 'inherit';
       s.textContent = str[i];
       el.appendChild(s);
     }

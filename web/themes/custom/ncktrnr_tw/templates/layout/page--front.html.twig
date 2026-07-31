@@ -60,7 +60,7 @@
          relative below md keeps it painting above the layers. The h1 is for
          document structure; the visible heading is the field's h2 #}
       {% if node.hasField('field_intro') and not node.field_intro.isEmpty %}
-        <div class="absolute top-[22%] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-3xl rounded-4xl border border-rust bg-sky/70 backdrop-blur-xs p-6 md:p-8 max-md:relative max-md:top-auto max-md:left-auto max-md:translate-x-0 max-md:mx-auto text-lg [&_p]:mt-4">
+        <div class="absolute top-[22%] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-3xl rounded-4xl border border-rust bg-sky/70 backdrop-blur-xs p-6 md:p-8 max-md:relative max-md:top-auto max-md:left-auto max-md:translate-x-0 max-md:mx-auto text-base md:text-lg lg:text-lead [&_p]:mt-4">
           {# Dragonfly perched on the box edge – inlined so the wing groups
              can take the CSS flutter (see .dragonfly-hero in tailwind.css) #}
           <div class="dragonfly-hero absolute -top-19 right-10 w-16 pointer-events-none" aria-hidden="true">
@@ -84,7 +84,11 @@
              inside the h2 #}
           {# rises on its own default range rather than joining the stagger:
              it sits above the grid, so it enters first and leads the cascade #}
-          <h2 id="columns-heading" class="rise text-center max-w-3xl mx-auto">{{ node.field_content.0.value|striptags|trim }}</h2>
+          {# Mono at the standard h2 size. A serif variant was tried here on the
+             theory that mono fails at sentence length, and reversed: this reads
+             better in mono, and what had actually gone wrong was the 30px, not
+             the sentence. The constraint is the size ceiling alone. #}
+          <h2 id="columns-heading" class="rise text-center max-w-3xl mx-auto mb-14">{{ node.field_content.0.value|striptags|trim }}</h2>
           {# icons keyed by column position – a 4th column simply gets none;
              heights differ on purpose (the seedhead blows up and away) #}
           {% set icons = [
@@ -94,9 +98,18 @@
           ] %}
           {# rise-stagger + rise: the three columns rise in as they enter the
              viewport, offset so they cascade (see tailwind.css) #}
-          <div class="grid md:grid-cols-3 gap-10 mt-14 rise-stagger">
+          <div class="grid md:grid-cols-3 gap-10 rise-stagger">
             {% for item in node.field_columns %}
-              <div class="rise text-lg [&_p]:mt-3 [&_p:last-child]:text-base [&_p:last-child]:text-ink-muted">
+              {# The muted last line of each column is a list of labels, not
+                 prose, so it keeps Geist Mono (agreed 2026-07-30).
+
+                 Three levels that have to read 1-2-3 down the column: the 24px
+                 mono h3, this serif line topping out at 22px, then the muted
+                 16px mono caption. Only the serif line moves with the ramp –
+                 the heading is fixed at the mono ceiling and the caption is
+                 separated by colour rather than size, so it stays 16px rather
+                 than shrinking further. #}
+              <div class="rise text-base md:text-lg lg:text-lead [&_p]:mt-3 [&_p:last-child]:font-mono [&_p:last-child]:text-base [&_p:last-child]:text-ink-muted">
                 {% if icons[loop.index0] is defined %}
                   <div class="flex items-end h-40 mb-6">
                     <img src="/themes/custom/ncktrnr_tw/images/column-icons/{{ icons[loop.index0].file }}.svg" alt="" class="{{ icons[loop.index0].size }} w-auto">
@@ -117,7 +130,9 @@
            cascading them would fire the two halves of one line separately #}
         <div class="rise container mx-auto px-4 py-16 lg:py-24 grid md:grid-cols-[14rem_1fr] gap-8 max-w-5xl">
           <h2 id="connect-heading">Let’s connect</h2>
-          <div class="text-lg [&_p+p]:mt-4 [&_a]:underline [&_a:hover]:text-rust">
+          {# Same ramp as the intro box and the About body: this is running text
+             and reading size belongs to the text, not to the section. #}
+          <div class="text-base md:text-lg lg:text-lead [&_p+p]:mt-4 [&_a]:underline [&_a:hover]:text-rust">
             {{ node.field_connect.processed }}
           </div>
         </div>

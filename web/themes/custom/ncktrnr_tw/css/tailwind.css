@@ -1,6 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+/* ---------------------------------------------------------------------------
+   Fonts, self-hosted (2026-07-30). Both faces are SIL OFL 1.1, so the licence
+   permits serving them from our own origin – which is the point: the Google
+   Fonts @import that used to sit above this was a render-blocking request to a
+   third party, on the critical path for every page.
+
+   Three variable files, latin subset, ~100KB total. Weight is declared as the
+   range 400-700 because each file carries the axis: one download covers
+   regular and bold, and `font-weight: 700` reaches the real bold rather than a
+   synthesised one. Only 400 and 700 are used anywhere in the theme (the old
+   @import also fetched 300 and 600, which nothing referenced).
+
+   The optical-size axis is deliberately not included. Requesting it roughly
+   doubles Literata's file size, and it resolves to the family's text default,
+   which is what body copy wants in any case.
+
+   unicode-range is the Google latin subset. Anything outside it falls back to
+   the next family in the stack, which is correct behaviour for a stray glyph –
+   the site's copy (including 'El Gran Sueño') sits inside it.
+
+   Paths are relative to the built stylesheet, css/styles.css, not to this file.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/geist-mono-latin-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Literata";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/literata-latin-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Literata";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/literata-italic-latin-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* Dark mode: manual override via data-theme on <html>; with no override,
    prefers-color-scheme decides (see the two value blocks below). */
@@ -183,14 +231,64 @@
 }
 
 @theme {
+    /* Two real faces (decision 4, revised 2026-07-30).
+
+       Geist Mono carries meta, labels and the wordmark, where the digital feel
+       is deliberate. Literata carries running text and headings: monospace at a
+       reading measure is a readability tax, and About is where it showed.
+
+       --font-sans is deliberately left at Tailwind's default rather than being
+       pointed at either face. Nothing in the theme uses `font-sans`, and
+       inheriting the default means a stray one looks obviously wrong instead of
+       silently resolving to the body face and hiding the mistake. */
     --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --font-sans: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --font-serif: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --font-body: var(--font-sans);
-    --font-display: var(--font-sans);
+    --font-serif: "Literata", Georgia, Cambria, "Times New Roman", Times, serif;
+
+    /* Semantic tokens. Base styles and templates use these, never the family
+       names, so the pairing can be re-pointed in one place.
+
+       Headings take the mono (agreed 2026-07-30). Card titles read better in the
+       serif on their own, but mono headings give the homepage more character and
+       make the mono a deliberate voice rather than a leftover – that is the
+       trade that was made, with both rendered and compared. Note this only
+       reaches card titles because the base layer no longer sets font-family on
+       `span`; Drupal renders the title inside one. */
+    --font-body: var(--font-serif);
+    --font-display: var(--font-mono);
 
     /* Type sizes use the stock Tailwind scale – the Figma sizes map exactly:
-       36px text-4xl · 24px text-2xl · 20px text-xl · 18px text-lg · 16px text-base */
+       36px text-4xl · 24px text-2xl · 20px text-xl · 18px text-lg · 16px text-base
+
+       Two measured facts govern how the pair is sized (2026-07-30):
+
+       1. The faces are near-identical vertically – x-height 0.540em mono vs
+          0.510em serif, caps 0.720 vs 0.710 – but mono is 24% wider per
+          character (0.600em vs 0.483em). Width, not height, is what makes mono
+          read as the bigger face. A 20px mono heading therefore outranks a 20px
+          serif line beneath it despite the identical px.
+
+       2. Geist Mono has no display range. It is a UI and code face: uniform
+          advance, modest contrast, no display cut. Fine to about 24px, and
+          increasingly sprawling above it – badly so for anything sentence
+          length, where the even advance stops the eye finding word shapes.
+
+       Fact 2 is the binding constraint and it caps the heading scale at 24px –
+       barely above the body size, where a conventional hierarchy wants three
+       clear levels. It is a ceiling on *size*, not on sentences: a full
+       sentence in 24px mono reads fine, and the homepage section heading is
+       one. Only the 30px attempt failed.
+
+       So the scale does not try to grow: h2 and h3 both sit at 24px, and the
+       levels are carried by face, weight and colour instead (agreed
+       2026-07-30). Mono being 25% wider is what lets a 24px mono heading
+       outrank a 22px serif line beneath it.
+
+       `text-lead` at 22px is the one custom step. It is where the reading ramp
+       tops out, the stock scale jumps 20 to 24, and running text outside
+       `prose` follows the same ramp – naming it once beats scattering
+       `text-[1.375rem]` through the templates. */
+    --text-lead: 1.375rem;
+    --text-lead--line-height: 1.55;
 
     /* Radii use the nearest stock utilities (2026-07-14: Figma is a
        starting point, round to stock Tailwind) – cards/intro rounded-4xl,
@@ -215,7 +313,7 @@
 
 @layer base {
     html {
-        font-family: var(--font-sans);
+        font-family: var(--font-body);
   }
 
     body {
@@ -228,14 +326,36 @@
         font-family: var(--font-display);
   }
 
-    /* Standard heading hierarchy (agreed 2026-07-14) – templates and editor
-       content share consistent sizes, no per-instance overrides */
-    h2 { @apply text-2xl font-bold; }
-    h3 { @apply text-xl font-bold; }
+    /* Standard heading hierarchy (agreed 2026-07-14; made responsive and
+       re-scaled 2026-07-30) – templates and editor content share consistent
+       sizes, no per-instance overrides.
 
-  p, span, a, li, ol, strong, em, b, i {
-    font-family: var(--font-body);
-  }
+       Fixed, not responsive, and both at 24px – the ceiling mono can hold (see
+       @theme). h3 matching h2 is a deliberate trade (agreed 2026-07-30): the
+       levels are already distinguished by position and context, and with the
+       usable range this narrow, fewer sizes reads as more harmonious than a
+       scale squeezed into 4px of headroom. Depth below h3 has never been needed.
+
+       Hierarchy against body text comes from face and weight rather than size:
+       mono sets 25% wider than the serif at the same px and these are bold
+       against regular, so a 24px mono heading is unmistakable over a 22px serif
+       line. Colour separates the muted mono captions below that.
+
+       The one size exception is the case-study card title, held at text-2xl
+       from its own template – which is now the same 24px, so it only guards
+       against the base sizes moving again. */
+    h2 { @apply text-2xl font-bold; }
+    h3 { @apply text-2xl font-bold; }
+
+    /* There is deliberately no `p, span, a, li, … { font-family: var(--font-body) }`
+       rule here. It was redundant – `body` sets the same family and everything
+       inherits it – and because it set font-family *directly* on those elements,
+       it beat anything inherited from an ancestor. That silently defeated four
+       separate things when the second face landed (2026-07-30): the wordmark,
+       whose letters js/logo-expand.js builds as spans; the card's link; the card
+       title, which Drupal renders as a span inside the h2, so the heading's own
+       font never reached its text; and any `font-mono` put on a wrapper. Adding
+       it back reintroduces all four. */
 }
 
 @layer components {
@@ -251,8 +371,11 @@
   .primary-nav {
     @apply flex items-center mx-auto max-w-2xl justify-between rounded-full bg-rust-tint px-6 py-4 backdrop-blur-md md:px-8;
     }
+  /* Nav links are labels, so they keep Geist Mono (decision 4). Stated here
+     rather than inherited: the body face changed underneath them in July 2026
+     and inheritance would have carried them along with it. */
   .primary-nav a {
-    @apply text-ink rounded-md inline-flex items-center;
+    @apply text-ink rounded-md inline-flex items-center font-mono;
     }
   .primary-nav a:focus-visible {
     outline: 1px solid var(--tone-ink); outline-offset: 2px;
@@ -416,6 +539,23 @@
         to { opacity: 1; translate: 0 0; }
     }
 
+    /* The wordmark stays Geist Mono (agreed 2026-07-30) and says so explicitly,
+       because it used to arrive by inheriting the body face. That is also what
+       keeps the two fallbacks valid: --logo-abbr-fallback and
+       --logo-full-fallback are ch values tuned to Geist Mono's advance width,
+       and in a proportional face they would be wrong and reflow the pill on
+       load – the nav-flash bug fixed on 15 July. Changing this means re-tuning
+       both.
+
+       `.logo span` is not belt-and-braces. js/logo-expand.js builds the animated
+       wordmark out of spans, and the base layer sets font-family directly on
+       `span`, so the anchor alone resolving to mono still left every visible
+       letter in the body face. */
+    .logo,
+    .logo span {
+        font-family: var(--font-mono);
+    }
+
     /* Anchor stays full width for reliable clicks */
     .logo {
         font-size: 20px;
@@ -555,7 +695,38 @@
   ------------------------------------------------------------------------- */
   .prose {
     font-family: var(--font-body);
-    max-width: 76ch;
+    /* Reading measure: 76 characters a line (2026-07-30).
+
+       `em`, not `ch`. `ch` is the advance width of "0", which in a monospace is
+       every character's width – so the old 76ch was exactly 76 characters, and
+       correct for Geist Mono. In a proportional face the ratio of "0" to the
+       real average advance varies enough that the same value gives anywhere
+       from 84 to 106 characters, and the number stops meaning anything. `em`
+       tracks font-size instead, so this one value holds at every step below,
+       where a px measure would drift.
+
+       38em is 79 characters in Literata, whose average advance over this site's
+       copy is 0.48em – 836px at the top of the ramp. Re-derive it if the body
+       face changes again.
+
+       79 is past the 45-75 that readability guidance gives, and deliberate
+       (agreed 2026-07-30): judged by eye it holds at this size, and the extra
+       width settles the column against the empty right-hand side of a 1280px
+       container, which a narrower measure left looking stranded. */
+    max-width: 38em;
+
+    /* Reading size, 16/18/22. 22px at the top rather than 20: it clears the
+       24px mono headings comfortably, and it is what puts the measure at 836px
+       instead of 730px. The width matters as much as the size here – a narrow
+       column on a 1280px container reads as stranded rather than composed.
+
+       Set here rather than through the plugin's size modifiers, which
+       preprocess no longer adds: an override would be a utility of equal
+       specificity relying on source order. Everything else in the plugin is
+       sized in `em`, so margins, list indents and heading sizes all scale from
+       this one value. */
+    font-size: 1rem;
+    line-height: 1.75;
 
     --tw-prose-body: var(--tone-ink);
     --tw-prose-headings: var(--tone-ink);
@@ -576,11 +747,43 @@
     --tw-prose-td-borders: var(--tone-line);
   }
 
-  .prose :is(h1, h2, h3, h4, h5, h6) {
-    font-family: var(--font-display);
+  /* See the reading-size note above. Separate rules rather than nested media
+     queries so the whole `.prose` block stays flat and greppable.
+
+     Three steps: 16px / 18px / 22px, matching text-base / text-lg / text-lead,
+     so running text outside `prose` follows the same ramp with plain utilities.
+     22px cannot start earlier than lg – the measure is 836px at that size and
+     the md container is 768px, so it would clamp and the line would run short.  */
+  @media (width >= 48rem) {
+    .prose { font-size: 1.125rem; }
+  }
+  @media (width >= 64rem) {
+    .prose { font-size: var(--text-lead); }
   }
 
+  /* Editor headings, held to the same 24px mono as the rest of the site.
+
+     The size override is the point. The plugin sizes prose headings in `em`, so
+     they scale with the reading size – at the top of the ramp a prose h2 would
+     reach 33px, well past what the mono can hold, and nobody would see it until
+     someone put a heading in a Basic page. Pinning them in `rem` breaks that
+     link deliberately: a heading in body copy does not need to grow with the
+     body, it needs to stay in the face's range.
+
+     All levels at one size, matching the h2/h3 decision in @layer base. A
+     smaller h3 here would drop below the 22px serif body it sits above, which
+     is the inversion this whole scale exists to avoid. */
+  .prose :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+  }
+
+  /* Page title. Mono, and only ever one or two words ('Work', 'About'), which
+     is what lets it go above the 24px ceiling at all – the ceiling is about
+     sentences, not size in the abstract. 30px is as far as it goes; the old
+     36px xl step was the largest mono on the site and the first place the face
+     started to sprawl. */
   h1.page-title {
-    @apply text-2xl lg:text-3xl xl:text-4xl;
+    @apply text-2xl md:text-3xl;
   }
 }

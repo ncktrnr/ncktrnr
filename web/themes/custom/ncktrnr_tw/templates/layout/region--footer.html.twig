@@ -12,6 +12,26 @@
  * @see template_preprocess_region()
  */
 #}
+{#
+  Everything in the footer is meta – the status line, the copyright and the
+  sign-off – so the whole region keeps Geist Mono (agreed 2026-07-30). The
+  status line arrives as a block body, which preprocess gives `prose`, and
+  `prose` sets font-family on itself; `[&_p]:font-mono` targets the paragraph
+  directly and lands in the utilities layer, which beats both that and the base
+  layer's rule on `p`.
+
+  `[&_.prose]:text-base` undoes the reading size for the same reason. The status
+  line is a block body, and ncktrnr_tw_preprocess_field() gives every block body
+  `prose` – which since 2026-07-30 ramps to 22px at lg, sizing a one-line footer
+  note like an About paragraph. `not-prose` is no use here: it suppresses prose
+  styling on descendants *of* a prose block, and this element is the prose block.
+  The descendant selector carries two classes, so it beats `.prose` outright
+  rather than depending on source order.
+
+  This comment sits outside the `set` tag deliberately. Twig lexes the whole tag
+  as one expression, so a comment opened inside the array is a syntax error and
+  returns a 500 for every page carrying the region.
+#}
 {%
   set classes = [
     'region',
@@ -25,16 +45,17 @@
     'flex-wrap',
     'justify-between',
     'gap-6',
+    '[&_p]:font-mono',
+    '[&_.prose]:text-base',
   ]
 %}
 
 {% if content %}
   <div{{ attributes.addClass(classes) }}>
     {{ content }}
-    <div class="flex gap-x-8">
+    <div class="flex gap-x-8 font-mono">
       <div>©{{ 'now' | date('Y') }} ncktrnr</div>
       <div>Made with plants, 100% vegan</div>
     </div>
   </div>
- 
 {% endif %}

@@ -50,8 +50,10 @@ function ncktrnr_tw_preprocess_field(array &$variables): void {
     return;
   }
 
+  // Only `prose`. The plugin's size modifiers are deliberately not used: the
+  // reading size steps to 22px at lg, which is not one of them, and it is set
+  // on `.prose` in css/tailwind.css alongside the measure it has to agree with.
   if (in_array($field_name, $prose_fields[$entity_type] ?? [], TRUE)) {
     $variables['attributes']['class'][] = 'prose';
-    $variables['attributes']['class'][] = 'lg:prose-lg';
   }
 }

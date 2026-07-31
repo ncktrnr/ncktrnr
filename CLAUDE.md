@@ -127,6 +127,54 @@ commit the diff in `config/sync/` with the related code.
   reach for `dark:prose-invert`: the `dark` variant here matches only the
   manual `[data-theme]` override, so it misses system dark with no stored
   choice.
+- **Never reinstate a `p, span, a, li, … { font-family: … }` rule in
+  `@layer base`.** It is redundant (`body` sets the family and everything
+  inherits) and it sets the property *directly*, so it beats anything inherited
+  from an ancestor. It silently defeated four things when the second face landed:
+  the wordmark, whose letters `js/logo-expand.js` builds as spans; the card's
+  link; the card title, which Drupal renders as a `span` inside the `h2`, so the
+  heading's own font never reached its text; and any `font-mono` on a wrapper.
+  Removed 2026-07-30.
+- **Drupal renders the title field as a `span` inside the heading**, so anything
+  set on `h1`–`h6` only reaches the text by inheritance. Check what the field
+  actually emits before writing a selector: `field_role`, `field_value` and
+  `field_description` all render a bare `div` with no `p` at all, so a
+  `[&_p]:` utility silently matches nothing.
+- **`js/logo-expand.js` measures with one span per character**, and `copyType()`
+  styles only their wrapper. Those spans carry `font: inherit` so they inherit
+  the wordmark's face; without it a stylesheet rule for `span` wins and the
+  letters get positioned to the wrong metrics while rendering in the right ones.
+- **A Twig comment cannot go inside a `{% … %}` tag.** Twig lexes the whole tag
+  as one expression, so a comment opened inside a `set` array is a syntax error
+  and returns a 500 for every page using the template. Put it above the tag.
+  Always load a page after editing Twig – `drush cr` reports success either way.
+- **A field prints its own `<div>`, so never wrap `{{ content.field_* }}` in a
+  `<p>`.** The parser closes the paragraph early and hoists the div out of it,
+  and every class on that `<p>` silently stops applying. Use a `<div>`.
+- **Two faces at the same px are not the same size.** Measured 2026-07-30: the
+  pair is near-identical vertically (x-height 0.540em Geist Mono vs 0.510em
+  Literata, caps 0.720 vs 0.710) but mono is **24% wider per character** (0.600em
+  vs 0.483em). Width is what makes mono read as the bigger face in a block, so
+  matching on width puts **mono at about 0.80× the serif's px for the same
+  level** – `text-lead` (22px) serif pairs with `text-lg` (18px) mono. Set a
+  serif at the same px as a mono beside it and the serif loses, which is how the
+  homepage columns ended up with their middle step reading smaller than the
+  caption below it. Compare levels in px-per-character, not px.
+- **`text-lead` (22px) is the one custom step** on an otherwise stock scale. It
+  is the size the prose ramp tops out at, and running text outside `prose` (the
+  homepage intro box, Let's connect, the column middle lines) follows the same
+  `text-lg md:text-xl lg:text-lead` ramp so the two agree.
+- **The reading measure is `em`, not `ch`.** `ch` is the advance of "0", which
+  in a monospace is every character's width – so `76ch` meant exactly 76
+  characters and only made sense while the body face was Geist Mono. In a
+  proportional face the same value lands anywhere from 84 to 106 characters.
+  `em` also survives the `lg:prose-lg` step from 16px to 18px, which a px value
+  does not.
+- **Full-page headless captures freeze `.rise` at its keyframe start**: the page
+  never scrolls, so scroll-driven reveals below the fold stay invisible and the
+  screenshot looks like content is missing. Pass `motion: "reduced"` for any
+  capture meant to show the whole page – with motion off the reveal is never
+  applied and everything renders.
 - **A template class change needs `npm run dev`, not just `drush cr`.**
   Tailwind scans the templates to decide which utilities to emit, so a class
   added to Twig simply does not exist in the CSS until the build runs – and

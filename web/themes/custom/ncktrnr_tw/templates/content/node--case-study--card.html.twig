@@ -73,27 +73,53 @@
 
   {# `grow` here rather than `mt-auto` on the lower third – same result,
      no top margin (spacing convention: margin-bottom and gap only). #}
-  <div class="grow flex flex-col gap-3 p-4 md:p-6">
+  <div class="grow flex flex-col gap-3 p-4 md:p-6 border-b border-ink/10">
     {# h2: the page's h1 is 'Work' and each card is a top-level section under
        it, so there is no intermediate heading to sit beneath. #}
+    {# Held at text-2xl rather than taking the responsive h2 scale (agreed
+       2026-07-30). A 608px card is a compact unit; the page-level h2 size steps
+       to 30px at md and makes a grid of six cards shout. Utilities beat the
+       base layer, so this wins at every width. #}
     {% if label %}
-      <h2>{{ label }}</h2>
+      <h2 class="text-2xl">{{ label }}</h2>
     {% endif %}
 
+    {# The role is meta, so it keeps Geist Mono while the title, description and
+       value statement take the body face (agreed 2026-07-30).
+
+       A `div`, not a `p`: the field renders its own `div`, and a div inside a p
+       makes the parser close the paragraph early and hoist the div out of it, so
+       nothing set on the wrapper reached the text. That had been quietly
+       swallowing `text-base` and `text-ink-muted` too. #}
     {% if content.field_role|render|trim is not empty %}
-      <p class="text-base text-ink-muted">{{ content.field_role }}</p>
+      <div class="font-mono text-base text-ink-muted">{{ content.field_role }}</div>
     {% endif %}
 
-    {{ content.field_description }}
+    {# `text-lg` so the summary outranks the 16px mono role above it. At 16px
+       the serif ran 7.7px a character against the mono's 9.6, which put the
+       meta ahead of the content it labels. #}
+    <div class="text-lg">{{ content.field_description }}</div>
   </div>
 
   {# Lower third: pinned to the bottom so cards of unequal height still line
      their value statements up across a row. #}
   {% if content.field_value|render|trim is not empty or content.field_link|render|trim is not empty %}
-    <div class="flex flex-col gap-3 border-t border-ink/10 p-4 md:p-6">
-      {{ content.field_value }}
+    <div class="flex flex-col gap-3 p-4 md:p-6">
+      {# Serif, not mono (revised 2026-07-30). Mono here was tried and reversed:
+         at the same px it is 24% wider per character, so the one-line claim
+         outweighed the summary above it and the two fought instead of reading
+         as statement-after-summary. The rule and the position already mark the
+         change of register; the face does not need to as well. #}
+      <div class="text-lg">{{ content.field_value }}</div>
+      {# The link renders as a bare domain, which is a label rather than prose –
+         Geist Mono, and monospace suits a URL.
+
+         `[&_a]:font-mono` rather than `font-mono` on this wrapper: the base
+         layer sets font-family directly on `a`, so an inherited family loses to
+         it and the link came out in the body face. The descendant utility hits
+         the anchor itself and lands in the utilities layer, which wins. #}
       {% if content.field_link|render|trim is not empty %}
-        <div class="text-base [&_a]:text-rust [&_a]:underline [&_a]:underline-offset-4">
+        <div class="text-base [&_a]:font-mono [&_a]:text-rust [&_a]:underline [&_a]:underline-offset-4">
           {{ content.field_link }}
         </div>
       {% endif %}
