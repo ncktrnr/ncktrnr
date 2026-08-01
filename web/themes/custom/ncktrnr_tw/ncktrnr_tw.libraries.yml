@@ -133,6 +133,14 @@ motion_toggle:
       attributes:
         defer: true
 
+video_loop:
+  js:
+    js/video-loop.js:
+      attributes:
+        defer: true
+  dependencies:
+    - ncktrnr_tw/motion_toggle
+
 lottie_player:
   js:
     https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js: { type: external, minified: true, attributes: { defer: true } }

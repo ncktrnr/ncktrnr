@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Row wrapper for the Gallery view.
+ *
+ * This element is the direct parent of the tiles, so the grid lives here
+ * rather than on the page or in the view's configuration – the same division
+ * as views-view-unformatted--featured-work.html.twig.
+ *
+ * Rows print bare: each tile is a <figure> that has to be the grid item
+ * itself, so it can carry its own column span. A per-row wrapper would take
+ * that place and every tile would come out one unit wide.
+ *
+ * Column counts stay here as utilities, and the grid reads --cols to size
+ * both the columns and the row track (see .gallery-grid in tailwind.css).
+ * Measured tile widths across the steps: 171 / 235 / 236 / 300 / 288px.
+ */
+#}
+{% if title %}
+  <h2>{{ title }}</h2>
+{% endif %}
+
+<div class="gallery">
+  <div class="gallery-grid [--cols:2] md:[--cols:3] lg:[--cols:4] 2xl:[--cols:5]">
+    {% for row in rows %}
+      {{- row.content -}}
+    {% endfor %}
+  </div>
+</div>

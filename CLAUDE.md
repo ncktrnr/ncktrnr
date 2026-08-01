@@ -127,6 +127,89 @@ commit the diff in `config/sync/` with the related code.
   reach for `dark:prose-invert`: the `dark` variant here matches only the
   manual `[data-theme]` override, so it misses system dark with no stored
   choice.
+- **Never reinstate a `p, span, a, li, … { font-family: … }` rule in
+  `@layer base`.** It is redundant (`body` sets the family and everything
+  inherits) and it sets the property *directly*, so it beats anything inherited
+  from an ancestor. It silently defeated four things when the second face landed:
+  the wordmark, whose letters `js/logo-expand.js` builds as spans; the card's
+  link; the card title, which Drupal renders as a `span` inside the `h2`, so the
+  heading's own font never reached its text; and any `font-mono` on a wrapper.
+  Removed 2026-07-30.
+- **Drupal renders the title field as a `span` inside the heading**, so anything
+  set on `h1`–`h6` only reaches the text by inheritance. Check what the field
+  actually emits before writing a selector: `field_role`, `field_value` and
+  `field_description` all render a bare `div` with no `p` at all, so a
+  `[&_p]:` utility silently matches nothing.
+- **`js/logo-expand.js` measures with one span per character**, and `copyType()`
+  styles only their wrapper. Those spans carry `font: inherit` so they inherit
+  the wordmark's face; without it a stylesheet rule for `span` wins and the
+  letters get positioned to the wrong metrics while rendering in the right ones.
+- **A Twig comment cannot go inside a `{% … %}` tag.** Twig lexes the whole tag
+  as one expression, so a comment opened inside a `set` array is a syntax error
+  and returns a 500 for every page using the template. Put it above the tag.
+  Always load a page after editing Twig – `drush cr` reports success either way.
+- **A field prints its own `<div>`, so never wrap `{{ content.field_* }}` in a
+  `<p>`.** The parser closes the paragraph early and hoists the div out of it,
+  and every class on that `<p>` silently stops applying. Use a `<div>`.
+- **Two faces at the same px are not the same size.** Measured 2026-07-30: the
+  pair is near-identical vertically (x-height 0.540em Geist Mono vs 0.510em
+  Literata, caps 0.720 vs 0.710) but mono is **24% wider per character** (0.600em
+  vs 0.483em). Width is what makes mono read as the bigger face in a block, so
+  matching on width puts **mono at about 0.80× the serif's px for the same
+  level** – `text-lead` (22px) serif pairs with `text-lg` (18px) mono. Set a
+  serif at the same px as a mono beside it and the serif loses, which is how the
+  homepage columns ended up with their middle step reading smaller than the
+  caption below it. Compare levels in px-per-character, not px.
+- **`text-lead` (22px) is the one custom step** on an otherwise stock scale. It
+  is the size the prose ramp tops out at, and running text outside `prose` (the
+  homepage intro box, Let's connect, the column middle lines) follows the same
+  `text-lg md:text-xl lg:text-lead` ramp so the two agree.
+- **The reading measure is `em`, not `ch`.** `ch` is the advance of "0", which
+  in a monospace is every character's width – so `76ch` meant exactly 76
+  characters and only made sense while the body face was Geist Mono. In a
+  proportional face the same value lands anywhere from 84 to 106 characters.
+  `em` also survives the `lg:prose-lg` step from 16px to 18px, which a px value
+  does not.
+- **Full-page headless captures freeze `.rise` at its keyframe start**: the page
+  never scrolls, so scroll-driven reveals below the fold stay invisible and the
+  screenshot looks like content is missing. Pass `motion: "reduced"` for any
+  capture meant to show the whole page – with motion off the reveal is never
+  applied and everything renders.
+- **`sizes: auto` solves a grid whose items are not all one width.** The gallery
+  has one- and two-column tiles sharing a single responsive image style, and a
+  view display cannot vary by field value, so an honest fixed `sizes` under-serves
+  the wide tiles by 2x (measured 0.97x device density on a 2x screen). Setting
+  `sizes: 'auto, <the normal list>'` fixes it: browsers that support `auto` use
+  the element's laid-out width (wides then pull 960w, 1.56x; squares get exactly
+  2.0x), and older ones fall through to the list. It only applies to
+  `loading="lazy"` images, which is the formatter's default here.
+- **A full-page headless capture never scrolls, so `loading="lazy"` images below
+  the fold stay blank** and the screenshot looks like the artwork is missing.
+  `cdp.mjs` runs `evalFile` *before* `shot`, so pass an eval that sets
+  `img.loading = 'eager'` on every image and awaits their `load` events. This is
+  a second, separate trap from the `.rise` one below – that needs
+  `motion: "reduced"`, this needs the eager flip, and a full-page capture of a
+  media-heavy page needs both.
+- **`media.bundle` is the bundle *field*, not the bundle name.** Media entities
+  have a `bundle` base field, so `media.bundle == 'video'` is an item list
+  compared to a string and is silently always false. Use `media.bundle()`, as
+  `media.html.twig` does.
+- **This install's `list_string` fields want the flat `{value: Label}` map**, not
+  the `[{value: …, label: …}]` sequence that `options.schema.yml` advertises. The
+  nested form fails on save with 'settings.allowed_values.0.label.0 doesn't exist'.
+- **Adding a field to a media bundle rewrites every existing display for it.**
+  Each new field joins the `hidden:` list and the dependency block of every view
+  and form display on that bundle – 54 files of diff noise for two fields. Expected,
+  not a mistake to hunt.
+- **Remote video is deliberately excluded from the gallery** (decided
+  2026-08-01) and its gallery fields were removed from the bundle, so it cannot
+  be flagged back in by accident. Moving image in the gallery is a still or a
+  short local loop, with the caption linking out to the hosted version. The
+  embed brought a consent gate, a third-party iframe per tile, a 16:9 shape that
+  pillarboxes in a square tile, and a provider thumbnail that can go stale.
+- **The footer dino reaches about 66px above the footer rule.** Anything whose
+  content runs to the bottom of the page needs clearance or the dino crosses it;
+  the card strip only got away with it because its last row ends on the left.
 - **A template class change needs `npm run dev`, not just `drush cr`.**
   Tailwind scans the templates to decide which utilities to emit, so a class
   added to Twig simply does not exist in the CSS until the build runs – and
@@ -146,8 +229,18 @@ commit the diff in `config/sync/` with the related code.
   'reduced', OS and stored choice already reconciled) and fires
   `ncktrnr:motionchange` on `document` when it changes, with the same value in
   `detail.motion`. The attribute is for the initial read – no event fires on
-  load. `js/lottie-motion.js` is the worked example; the video lead items will
-  want the same pair.
+  load. `js/lottie-motion.js` is the worked example; `js/video-loop.js` is the
+  second, and the card lead items reuse it unchanged.
+- **`js/video-loop.js` drives any `<video class="js-video-loop">`**: plays it
+  only when motion is on *and* it is in view (IntersectionObserver, 100px
+  margin), pauses and rewinds to 0 otherwise. `autoplay` is kept off the markup
+  for the same reason as the Lottie players – it is read at parse time – and the
+  poster is what shows when playback is refused, which is why it is a required
+  field on the `video` media type.
+- **A local video loop cannot carry transparency** – H.264 has no alpha – so
+  unlike the gallery's PNGs and SVGs a loop always shows its own background
+  rectangle, in both themes. Author the loop on a background that works on
+  cream *and* on near-black, or it reads as a bright block in dark mode.
 - **`.reveal` belongs to the logo's expanding mask** (`.logo .reveal`). Scroll
   reveals are `.rise` / `.rise-stagger`. A generic `.reveal` landed straight on
   the logo and was invisible in screenshots – check what a new class name

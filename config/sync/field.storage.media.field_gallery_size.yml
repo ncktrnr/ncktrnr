@@ -1,0 +1,27 @@
+uuid: bafc63e3-0116-41b0-9758-5e5ce160b9f3
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+    - options
+id: media.field_gallery_size
+field_name: field_gallery_size
+entity_type: media
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: square
+      label: Square
+    -
+      value: wide
+      label: 'Wide (two columns)'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

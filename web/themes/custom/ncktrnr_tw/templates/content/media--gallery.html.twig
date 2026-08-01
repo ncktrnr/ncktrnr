@@ -1,0 +1,109 @@
+{#
+/**
+ * @file
+ * One tile in the work-page gallery.
+ *
+ * The tile is a fixed square unit (or two units wide) in the grid defined by
+ * views-view-unformatted--gallery.html.twig. Everything inside it is
+ * absolutely positioned against that square, so nothing an item contains can
+ * change its geometry.
+ *
+ * Three parts:
+ * - the border, drawn either at the tile edge or inset behind the artwork
+ * - the artwork, fitted to the tile by object-fit
+ * - the caption, which sits below the tile in the grid's row gap
+ *
+ * The tile does not link anywhere. Only the caption does, following the work
+ * card: a picture that responds to the pointer implies it is clickable, and
+ * the one place that should take a click is the one that looks like a link.
+ * The frame is kept as its own element inside the <figure> so it can become a
+ * button for click-to-expand later without wrapping the caption's link.
+ *
+ * Available variables: see media.html.twig.
+ */
+#}
+{% set size = media.field_gallery_size.value|default('square') %}
+{% set frame = media.field_gallery_frame.value|default('framed') %}
+{% set caption = media.field_caption.value %}
+
+{# The link field is configured external-only, so its raw uri is the href and
+   there is no internal route to resolve. #}
+{% set link = media.field_gallery_link.0.uri %}
+
+{# How the artwork meets its border.
+
+   framed   – border at the tile edge, artwork covers the tile and is clipped
+              to the radius inside it
+   inset    – border at the tile edge, artwork sits within it with air around;
+              what an icon or a diagram wants
+   breakout – border drawn *inside* the tile and behind the artwork, which
+              fills the whole tile and so crosses it. Opaque pixels occlude
+              the line, which is what sells the effect – and why it only works
+              with transparency. A PNG with a solid background covers the
+              border in a rectangle.
+
+   No z-index anywhere: both children are positioned, so they paint in source
+   order and the artwork is already on top of the inset border. #}
+{% set art = {
+  framed: 'gallery-art--cover overflow-hidden rounded-3xl border border-frame',
+  inset: 'gallery-art--contain rounded-3xl border border-frame p-5',
+  breakout: 'gallery-art--contain',
+} %}
+
+{%
+  set classes = [
+    'gallery-tile',
+    'rise',
+    size == 'wide' ? 'col-span-2',
+    not media.isPublished() ? 'media--unpublished',
+  ]
+%}
+
+<figure{{ attributes.addClass(classes) }}>
+  {{ title_suffix.contextual_links }}
+
+  {% if frame == 'breakout' %}
+    <span class="pointer-events-none absolute inset-4 rounded-3xl border border-frame" aria-hidden="true"></span>
+  {% endif %}
+
+  <div class="gallery-art absolute inset-0 {{ art[frame] }}">
+    {# bundle(), with the parentheses: `media.bundle` is the entity's bundle
+       *field*, an item list, which never equals the string. #}
+    {% if media.bundle() == 'video' %}
+      {# Built here rather than by a formatter: none of them emit a poster, and
+         the poster is the reduced-motion fallback. `autoplay` is deliberately
+         absent – it is read at parse time, so leaving it off is what lets
+         js/video-loop.js hold playback to the motion preference. #}
+      {{ attach_library('ncktrnr_tw/video_loop') }}
+      {% set file = media.field_media_video_file.entity %}
+      {% set poster = media.field_video_poster %}
+      <video class="js-video-loop"
+        {% if poster.entity %}poster="{{ file_url(poster.entity.uri.value) }}" width="{{ poster.width }}" height="{{ poster.height }}"{% endif %}
+        muted loop playsinline preload="metadata">
+        <source src="{{ file_url(file.uri.value) }}" type="{{ file.filemime.value }}">
+      </video>
+    {% else %}
+      {{ content }}
+    {% endif %}
+  </div>
+
+  {# Always visible, never on hover. The work card's lower third made the same
+     call for the same reasons: hover does not exist on touch, and a link that
+     only appears while the pointer is over it is undiscoverable.
+
+     Geist Mono at text-sm – the caption is meta, the same register as the
+     card's role line, and 14px is the step down a 236px tile asks for.
+
+     line-clamp-2 as well as the band's own clipping: the height alone cuts a
+     third line off mid-stroke, which reads as a rendering fault rather than
+     as text that carries on. #}
+  {% if caption %}
+    <figcaption class="gallery-caption line-clamp-2 font-mono text-sm text-ink-muted">
+      {% if link %}
+        <a href="{{ link }}" class="text-rust underline underline-offset-4">{{ caption }}</a>
+      {% else %}
+        {{ caption }}
+      {% endif %}
+    </figcaption>
+  {% endif %}
+</figure>

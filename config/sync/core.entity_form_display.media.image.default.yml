@@ -4,7 +4,9 @@ status: true
 dependencies:
   config:
     - field.field.media.image.field_caption
+    - field.field.media.image.field_gallery_frame
     - field.field.media.image.field_gallery_link
+    - field.field.media.image.field_gallery_size
     - field.field.media.image.field_in_gallery
     - field.field.media.image.field_media_image
     - image.style.media_library
@@ -21,19 +23,31 @@ mode: default
 content:
   field_caption:
     type: string_textfield
-    weight: 21
+    weight: 23
     region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  field_gallery_frame:
+    type: options_select
+    weight: 22
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_gallery_link:
     type: link_default
-    weight: 22
+    weight: 24
     region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
+    third_party_settings: {  }
+  field_gallery_size:
+    type: options_select
+    weight: 21
+    region: content
+    settings: {  }
     third_party_settings: {  }
   field_in_gallery:
     type: boolean_checkbox
