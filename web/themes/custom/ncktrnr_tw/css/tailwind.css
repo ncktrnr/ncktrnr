@@ -134,6 +134,13 @@
     --tone-ink-muted: #636363;
     /* hairlines – rules, table and blockquote borders */
     --tone-line: color-mix(in srgb, var(--tone-ink) 15%, transparent);
+    /* Gallery tile frames. Deliberately stronger than --tone-line and separate
+       from it: a rule under a heading only has to be noticed, whereas this one
+       has to hold a tile together and, in the break-out mode, read as a line
+       the artwork is crossing. Tuned per theme rather than as one alpha over
+       --tone-ink, because a light hairline on near-black and a dark one on
+       cream do not read as equally present at the same value. */
+    --tone-frame: color-mix(in srgb, var(--tone-ink) 22%, transparent);
 
     /* accents.
        Rust is a shade darker than the Figma swatch (#da3d12), which measured
@@ -161,6 +168,7 @@
     --tone-ink: #f2ede1;
     --tone-ink-muted: #a39d92;
     --tone-line: color-mix(in srgb, var(--tone-ink) 20%, transparent);
+    --tone-frame: color-mix(in srgb, var(--tone-ink) 26%, transparent);
 
     --tone-rust: #ff6a3c;
     --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
@@ -182,6 +190,7 @@
         --tone-ink: #f2ede1;
         --tone-ink-muted: #a39d92;
         --tone-line: color-mix(in srgb, var(--tone-ink) 20%, transparent);
+    --tone-frame: color-mix(in srgb, var(--tone-ink) 26%, transparent);
 
         --tone-rust: #ff6a3c;
         --tone-rust-tint: color-mix(in srgb, var(--tone-rust) 16%, transparent);
@@ -306,6 +315,7 @@
     --color-ink-muted: var(--tone-ink-muted);
     --color-rust: var(--tone-rust);
     --color-rust-tint: var(--tone-rust-tint);
+    --color-frame: var(--tone-frame);
     --color-leaf: var(--tone-leaf);
     --color-leaf-bright: var(--tone-leaf-bright);
     --color-leaf-deep: var(--tone-leaf-deep);
@@ -652,6 +662,75 @@
         2.5%, 7.5%, 12.5%, 17.5%, 22.5% { transform: scaleX(0.7); }
         25%, 100% { transform: scaleX(1); }
     }
+
+    /* -----------------------------------------------------------------------
+       Gallery grid (work page, 2026-08-01). A modular grid of square tiles –
+       one unit each, two units wide for the occasional landscape piece. Rows
+       are always one unit tall, which is what keeps the geometry exact.
+
+       Two things here cannot be said with utilities, and nothing else is:
+
+       1. The row height has to equal the *computed* column width.
+          `aspect-square` on the tiles is the usual answer and it is unsafe:
+          a row made up only of two-column tiles has nothing square in it and
+          collapses to its content. Sizing the row track directly cannot fail
+          that way, whatever mix of spans `dense` packing produces.
+
+       2. A tile's contents arrive as <picture>, a bare <img> or a <video>,
+          depending on the media type. One `:is()` rule fits all three; the
+          utility equivalent is six arbitrary variants repeated for each frame
+          mode.
+
+       Column counts, spans, borders, radii, colour and padding all stay in
+       the template as utilities.
+
+       --cell is derived in container query units so it tracks the real
+       container rather than a breakpoint guess. It has to be read *inside*
+       the query container, because an element is never its own container –
+       which is why .gallery wraps .gallery-grid instead of being it.
+    ----------------------------------------------------------------------- */
+    .gallery { container-type: inline-size; }
+
+    .gallery-grid {
+        --gap: 1rem;
+        /* Two lines of caption plus the space above them. The band lives in
+           the row gap rather than in the tile, so the tiles stay exactly
+           square and an uncaptioned tile costs the grid nothing. The last row
+           has no gap after it, hence the matching padding below. */
+        --band: 3rem;
+        --cell: calc((100cqw - (var(--cols) - 1) * var(--gap)) / var(--cols));
+
+        display: grid;
+        grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+        grid-auto-rows: var(--cell);
+        /* Back-fills the holes a two-column tile leaves. Visual order can
+           then differ from DOM order; DOM order stays newest-first. */
+        grid-auto-flow: dense;
+        column-gap: var(--gap);
+        row-gap: calc(var(--gap) + var(--band));
+        padding-bottom: var(--band);
+    }
+
+    .gallery-tile { position: relative; }
+
+    /* Sits in the row gap, under its own tile. Clipped to the band so a long
+       caption can never push into the row below. */
+    .gallery-caption {
+        position: absolute;
+        inset-inline: 0;
+        top: calc(100% + 0.5rem);
+        max-height: calc(var(--band) - 0.5rem);
+        overflow: hidden;
+    }
+
+    /* The media itself, whatever element the source field emitted. The first
+       rule flattens the formatter's own wrappers – <picture> is inline by
+       default, so a percentage height on the <img> inside it has no
+       containing block to resolve against and silently collapses. */
+    .gallery-art > * { display: block; block-size: 100%; inline-size: 100%; }
+    .gallery-art :is(img, video) { block-size: 100%; inline-size: 100%; }
+    .gallery-art--cover :is(img, video) { object-fit: cover; }
+    .gallery-art--contain :is(img, video) { object-fit: contain; }
 
       /* High-contrast and forced-colors adjustments */
     @media (prefers-contrast: more) {

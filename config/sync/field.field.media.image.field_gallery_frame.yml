@@ -1,0 +1,23 @@
+uuid: b1075d93-b265-4655-bcb2-09f45238f614
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_gallery_frame
+    - media.type.image
+  module:
+    - options
+id: media.image.field_gallery_frame
+field_name: field_gallery_frame
+entity_type: media
+bundle: image
+label: 'Gallery frame'
+description: 'Break out needs artwork with transparency - a PNG with a solid background will simply cover the border.'
+required: false
+translatable: true
+default_value:
+  -
+    value: framed
+default_value_callback: ''
+settings: {  }
+field_type: list_string

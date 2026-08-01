@@ -1,0 +1,30 @@
+uuid: 74461ead-4d65-4f7f-bd92-828f582084cc
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+    - options
+id: media.field_gallery_frame
+field_name: field_gallery_frame
+entity_type: media
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: framed
+      label: 'Framed - border at the tile edge, artwork fills it'
+    -
+      value: inset
+      label: 'Inset - border at the tile edge, artwork sits inside it'
+    -
+      value: breakout
+      label: 'Break out - border drawn inside, artwork crosses it'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

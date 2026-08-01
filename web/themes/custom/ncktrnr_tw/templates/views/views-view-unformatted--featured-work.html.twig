@@ -26,7 +26,12 @@
   rise-stagger-2 + rise: cards rise in as they enter the viewport, the
   right-hand card of each row trailing its neighbour (see tailwind.css).
 #}
-<div class="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 rise-stagger-2">
+{#
+  mb-20 separates the strip from the gallery block below it. Spacing runs
+  downwards, so the gap belongs to the section above rather than to the
+  gallery – and it is harmless on a page where the strip stands alone.
+#}
+<div class="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 rise-stagger-2 mb-20">
   {% for row in rows %}
     <div{{ row.attributes.addClass('flex', 'rise') }}>
       {{- row.content -}}

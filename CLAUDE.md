@@ -175,6 +175,41 @@ commit the diff in `config/sync/` with the related code.
   screenshot looks like content is missing. Pass `motion: "reduced"` for any
   capture meant to show the whole page – with motion off the reveal is never
   applied and everything renders.
+- **`sizes: auto` solves a grid whose items are not all one width.** The gallery
+  has one- and two-column tiles sharing a single responsive image style, and a
+  view display cannot vary by field value, so an honest fixed `sizes` under-serves
+  the wide tiles by 2x (measured 0.97x device density on a 2x screen). Setting
+  `sizes: 'auto, <the normal list>'` fixes it: browsers that support `auto` use
+  the element's laid-out width (wides then pull 960w, 1.56x; squares get exactly
+  2.0x), and older ones fall through to the list. It only applies to
+  `loading="lazy"` images, which is the formatter's default here.
+- **A full-page headless capture never scrolls, so `loading="lazy"` images below
+  the fold stay blank** and the screenshot looks like the artwork is missing.
+  `cdp.mjs` runs `evalFile` *before* `shot`, so pass an eval that sets
+  `img.loading = 'eager'` on every image and awaits their `load` events. This is
+  a second, separate trap from the `.rise` one below – that needs
+  `motion: "reduced"`, this needs the eager flip, and a full-page capture of a
+  media-heavy page needs both.
+- **`media.bundle` is the bundle *field*, not the bundle name.** Media entities
+  have a `bundle` base field, so `media.bundle == 'video'` is an item list
+  compared to a string and is silently always false. Use `media.bundle()`, as
+  `media.html.twig` does.
+- **This install's `list_string` fields want the flat `{value: Label}` map**, not
+  the `[{value: …, label: …}]` sequence that `options.schema.yml` advertises. The
+  nested form fails on save with 'settings.allowed_values.0.label.0 doesn't exist'.
+- **Adding a field to a media bundle rewrites every existing display for it.**
+  Each new field joins the `hidden:` list and the dependency block of every view
+  and form display on that bundle – 54 files of diff noise for two fields. Expected,
+  not a mistake to hunt.
+- **Remote video is deliberately excluded from the gallery** (decided
+  2026-08-01) and its gallery fields were removed from the bundle, so it cannot
+  be flagged back in by accident. Moving image in the gallery is a still or a
+  short local loop, with the caption linking out to the hosted version. The
+  embed brought a consent gate, a third-party iframe per tile, a 16:9 shape that
+  pillarboxes in a square tile, and a provider thumbnail that can go stale.
+- **The footer dino reaches about 66px above the footer rule.** Anything whose
+  content runs to the bottom of the page needs clearance or the dino crosses it;
+  the card strip only got away with it because its last row ends on the left.
 - **A template class change needs `npm run dev`, not just `drush cr`.**
   Tailwind scans the templates to decide which utilities to emit, so a class
   added to Twig simply does not exist in the CSS until the build runs – and
@@ -194,8 +229,18 @@ commit the diff in `config/sync/` with the related code.
   'reduced', OS and stored choice already reconciled) and fires
   `ncktrnr:motionchange` on `document` when it changes, with the same value in
   `detail.motion`. The attribute is for the initial read – no event fires on
-  load. `js/lottie-motion.js` is the worked example; the video lead items will
-  want the same pair.
+  load. `js/lottie-motion.js` is the worked example; `js/video-loop.js` is the
+  second, and the card lead items reuse it unchanged.
+- **`js/video-loop.js` drives any `<video class="js-video-loop">`**: plays it
+  only when motion is on *and* it is in view (IntersectionObserver, 100px
+  margin), pauses and rewinds to 0 otherwise. `autoplay` is kept off the markup
+  for the same reason as the Lottie players – it is read at parse time – and the
+  poster is what shows when playback is refused, which is why it is a required
+  field on the `video` media type.
+- **A local video loop cannot carry transparency** – H.264 has no alpha – so
+  unlike the gallery's PNGs and SVGs a loop always shows its own background
+  rectangle, in both themes. Author the loop on a background that works on
+  cream *and* on near-black, or it reads as a bright block in dark mode.
 - **`.reveal` belongs to the logo's expanding mask** (`.logo .reveal`). Scroll
   reveals are `.rise` / `.rise-stagger`. A generic `.reveal` landed straight on
   the logo and was invisible in screenshots – check what a new class name

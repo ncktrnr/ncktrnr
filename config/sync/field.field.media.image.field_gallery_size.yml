@@ -1,0 +1,23 @@
+uuid: 48102813-1625-47b4-812c-ddc58d1af678
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_gallery_size
+    - media.type.image
+  module:
+    - options
+id: media.image.field_gallery_size
+field_name: field_gallery_size
+entity_type: media
+bundle: image
+label: 'Gallery size'
+description: 'How many columns the tile occupies. Rows are always one tile tall.'
+required: false
+translatable: true
+default_value:
+  -
+    value: square
+default_value_callback: ''
+settings: {  }
+field_type: list_string

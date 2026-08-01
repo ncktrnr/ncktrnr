@@ -5,7 +5,9 @@ dependencies:
   config:
     - core.entity_view_mode.media.1_1_square_small
     - field.field.media.image.field_caption
+    - field.field.media.image.field_gallery_frame
     - field.field.media.image.field_gallery_link
+    - field.field.media.image.field_gallery_size
     - field.field.media.image.field_in_gallery
     - field.field.media.image.field_media_image
     - media.type.image
@@ -33,7 +35,9 @@ content:
 hidden:
   created: true
   field_caption: true
+  field_gallery_frame: true
   field_gallery_link: true
+  field_gallery_size: true
   field_in_gallery: true
   name: true
   thumbnail: true

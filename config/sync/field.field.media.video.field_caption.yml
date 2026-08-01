@@ -1,14 +1,14 @@
-uuid: b39d4a7c-87d0-4307-99d8-e0828eefa214
+uuid: 1b24b72b-1911-41b2-95d1-fa7128e2260f
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.media.field_caption
-    - media.type.remote_video
-id: media.remote_video.field_caption
+    - media.type.video
+id: media.video.field_caption
 field_name: field_caption
 entity_type: media
-bundle: remote_video
+bundle: video
 label: Caption
 description: ''
 required: false

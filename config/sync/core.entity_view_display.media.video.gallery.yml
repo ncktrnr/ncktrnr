@@ -1,0 +1,46 @@
+uuid: 1aecab23-7cd0-4263-9120-63770611417c
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.gallery
+    - field.field.media.video.field_caption
+    - field.field.media.video.field_gallery_frame
+    - field.field.media.video.field_gallery_link
+    - field.field.media.video.field_gallery_size
+    - field.field.media.video.field_in_gallery
+    - field.field.media.video.field_media_video_file
+    - field.field.media.video.field_video_poster
+    - media.type.video
+id: media.video.gallery
+targetEntityType: media
+bundle: video
+mode: gallery
+content: {  }
+hidden:
+  bundle: true
+  changed: true
+  created: true
+  default_langcode: true
+  field_caption: true
+  field_gallery_frame: true
+  field_gallery_link: true
+  field_gallery_size: true
+  field_in_gallery: true
+  field_media_video_file: true
+  field_video_poster: true
+  mid: true
+  name: true
+  path: true
+  publish_on: true
+  revision_created: true
+  revision_default: true
+  revision_log_message: true
+  revision_translation_affected: true
+  revision_user: true
+  status: true
+  thumbnail: true
+  uid: true
+  unpublish_on: true
+  uuid: true
+  vid: true

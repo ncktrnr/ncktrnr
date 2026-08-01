@@ -1,16 +1,16 @@
-uuid: b03fe3f1-ff28-43fe-83a4-3d36424ed840
+uuid: 124e5356-f3be-4a12-b6ae-a52624b7b85c
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.media.field_gallery_link
-    - media.type.remote_video
+    - media.type.video
   module:
     - link
-id: media.remote_video.field_gallery_link
+id: media.video.field_gallery_link
 field_name: field_gallery_link
 entity_type: media
-bundle: remote_video
+bundle: video
 label: Link
 description: ''
 required: false

@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * The gallery block on the work page.
+ *
+ * Exists to give the section its heading spacing. The generic block template
+ * has no margins, which is right for it – every other block on the site sits
+ * inside a layout that already spaces it – and wrong here, where the block is
+ * a titled section following another one.
+ *
+ * The gap above the gallery is not set here: it is a margin-bottom on the
+ * featured-work grid, so spacing runs downwards in one direction as the
+ * theme's convention requires.
+ *
+ * Available variables: see block.html.twig.
+ */
+#}
+{#
+  pb-16, not a margin: the footer dino is positioned to straddle the footer
+  rule and reaches about 66px above it, which put it straight through the last
+  row of captions. Padding rather than margin-bottom because the node's own
+  mb-12 would collapse with a margin here and the clearance would be the
+  larger of the two rather than the sum.
+#}
+<div{{ attributes.addClass('block', 'block-views', 'block-views-blockgallery-block-1', 'pb-16') }}>
+  {{ title_prefix }}
+  {% if label %}
+    <h2{{ title_attributes.addClass('mb-6') }}>{{ label }}</h2>
+  {% endif %}
+  {{ title_suffix }}
+  {% block content %}
+    {{ content }}
+  {% endblock %}
+</div>
